@@ -153,10 +153,22 @@ export const タブ状態 = {
     value: { active: "active", inactive: "inactive" },
 } as const;
 
+// 選択中タブを「持ち上がったカード」として描き分ける(ユーザー実機指摘: 背景がペイン背景と
+// 同一だったため、ペイン背景自体が明るいテーマで周囲の白と同化し無境界で判別不能だった)。
+// 背景をペイン背景ではなくパネル表面トークンにし、タブバー背景(半透過白になりうる)との
+// 微差で選択状態を示す。上辺にペインアクセントの太線、左右にペインタブ境界線の細線を足し、
+// 4本とも box-shadow(inset) で表現する: border だと幅ぶんの高さ/幅補正が要り、ホスト側の
+// box-sizing 設定(このライブラリはリセットCSSを持たない)に依存してタブが1〜3pxずれる
+// リスクがあるが、inset box-shadow はボックスサイズに一切影響しないため補正不要で済む。
 globalStyle(`${タブボタン}[${タブ状態.attribute}="${タブ状態.value.active}"]`, {
-    backgroundColor: css変数("ペイン背景"),
+    backgroundColor: css変数("パネル表面"),
     color: css変数("ペインタブアクティブテキスト"),
-    borderBottom: `1px solid ${css変数("ペイン背景")}`,
+    border: "none",
+    boxShadow: [
+        `inset 0 2px 0 0 ${css変数("ペインアクセント")}`,
+        `inset 1px 0 0 0 ${css変数("ペインタブ境界線")}`,
+        `inset -1px 0 0 0 ${css変数("ペインタブ境界線")}`,
+    ].join(", "),
 });
 
 export const タブ閉じる = style({

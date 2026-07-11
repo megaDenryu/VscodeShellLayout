@@ -1,5 +1,6 @@
 import { div, DivC, LV2HtmlComponentBase } from "sengen-ui";
 import * as styles from './style.css';
+import { iframeへのポインタイベントを一時停止する } from '../ドラッグ制御/iframeポインタ制御';
 
 export type スプリッター方向 = '水平' | '垂直';
 
@@ -35,6 +36,9 @@ export class スプリッター extends LV2HtmlComponentBase {
         const カーソル = this.方向 === '水平' ? 'row-resize' : 'col-resize';
         document.body.style.cursor = カーソル;
         document.body.style.userSelect = 'none';
+        // マトリョーシカシェル対策: ドラッグ追跡中はiframeへのポインタイベントを止める
+        // (iframeポインタ制御.ts参照)。onUpで必ず解除する。
+        const iframe制御 = iframeへのポインタイベントを一時停止する();
 
         const onMove = (e: MouseEvent) => {
             const 現在位置 = this.方向 === '水平' ? e.clientY : e.clientX;
@@ -49,6 +53,7 @@ export class スプリッター extends LV2HtmlComponentBase {
             // this._componentRoot ではなく document に配線している
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
+            iframe制御.解除する();
         };
 
         document.addEventListener('mousemove', onMove);

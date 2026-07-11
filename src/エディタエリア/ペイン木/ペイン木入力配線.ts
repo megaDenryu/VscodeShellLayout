@@ -15,6 +15,10 @@ import { ペインID採番器 } from "./ID採番器";
 import { ペイン木矩形計測器 } from "./矩形計測";
 import { タブ視覚効果 } from "./視覚効果";
 import * as styles from "./style.css";
+import {
+    iframeへのポインタイベントを一時停止する,
+    type iframeポインタ制御ハンドル,
+} from "../../ドラッグ制御/iframeポインタ制御";
 
 export interface ペイン木入力配線コールバック {
     readonly 現在のレイアウトを取得: () => レイアウト;
@@ -47,6 +51,9 @@ export class ペイン木入力配線 {
     private _onDocumentMove: ((e: PointerEvent) => void) | null = null;
     private _onDocumentUp: ((e: PointerEvent) => void) | null = null;
     private _onDocumentKeydown: ((e: KeyboardEvent) => void) | null = null;
+    // マトリョーシカシェル対策: ドラッグ追跡中(タブDnD/スプリッター共通)はiframeへの
+    // ポインタイベントを止める(iframeポインタ制御.ts参照)。_入力配線解除()で必ず解除する。
+    private _iframe制御: iframeポインタ制御ハンドル | null = null;
     // body の inline style を退避してから上書きする。空文字復元すると親アプリが
     // body cursor/userSelect を使っていた場合に値を破壊するため、押下時の元値で正確に戻す。
     private _body元style: 退避済body様式 | null = null;
@@ -85,6 +92,7 @@ export class ペイン木入力配線 {
         document.addEventListener("pointerup", this._onDocumentUp);
         this._Esc配線を登録();
         this._body様式を上書き("grabbing");
+        this._iframe制御 = iframeへのポインタイベントを一時停止する();
     }
 
     private _ドラッグタブの元タブバー矩形(タブ: タブID): 矩形 | null {
@@ -111,6 +119,7 @@ export class ペイン木入力配線 {
         // 水平スプリッターは上下分割の境界を縦にドラッグするので row-resize、
         // 垂直スプリッターは左右分割の境界を横にドラッグするので col-resize。
         this._body様式を上書き(方向 === "水平" ? "row-resize" : "col-resize");
+        this._iframe制御 = iframeへのポインタイベントを一時停止する();
     }
 
     直前にドラッグしたか(): boolean {
@@ -198,6 +207,8 @@ export class ペイン木入力配線 {
         this._DnD矩形キャッシュ = null;
         this._視覚効果.ドロップヒントを隠す(this._ドロップヒント.dom.element);
         this._body様式を復元();
+        this._iframe制御?.解除する();
+        this._iframe制御 = null;
         // queueMicrotask は click より前に走るため使えない。setTimeout で次サイクルへ逃がす。
         setTimeout(() => { this._直前にドラッグした = false; }, 0);
     }
