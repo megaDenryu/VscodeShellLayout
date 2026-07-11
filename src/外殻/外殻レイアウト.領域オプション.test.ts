@@ -6,6 +6,7 @@
 // テーマのCSSカスタムプロパティ化を検証する。
 
 import { describe, expect, it } from "vitest";
+import { div } from "sengen-ui";
 import { 外殻レイアウト } from "./外殻レイアウト";
 import { テーマCSS変数名 } from "../テーマ/テーマCSS変数";
 
@@ -38,6 +39,12 @@ describe("外殻レイアウト 領域のオプション化", () => {
     it("ステータスバー表示: true（省略時含む）なら右テキストが描画される", () => {
         const シェル = new 外殻レイアウト({ ...基本オプション(), ステータスバー右テキスト: "ステータス文言" });
         expect(シェル.dom.element.textContent).toContain("ステータス文言");
+    });
+
+    it("ステータスバー右にコンポーネントを渡すと、ステータスバー右セクションへ配置される（ステータスバー左と対称のスロット）", () => {
+        const 右コンポーネント = div({ text: "右スロット部品" });
+        const シェル = new 外殻レイアウト({ ...基本オプション(), ステータスバー右: 右コンポーネント });
+        expect(シェル.dom.element.textContent).toContain("右スロット部品");
     });
 });
 
