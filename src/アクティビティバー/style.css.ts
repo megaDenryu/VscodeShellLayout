@@ -1,12 +1,12 @@
 import { style, globalStyle } from '@vanilla-extract/css';
-import { 配色 } from '../テーマ/デフォルトテーマ';
+import { css変数 } from '../テーマ/テーマCSS変数';
 
 export const バー = style({
     display: 'flex',
     flexDirection: 'column',
     width: '48px',
-    backgroundColor: 配色.クローム背景,
-    borderRight: `1px solid ${配色.クローム境界線}`,
+    backgroundColor: css変数('クローム背景'),
+    borderRight: `1px solid ${css変数('クローム境界線')}`,
     paddingTop: '4px',
     flexShrink: 0,
 });
@@ -31,12 +31,12 @@ export const 項目 = style({
     width: '48px',
     height: '48px',
     cursor: 'pointer',
-    color: 配色.テキスト副,
+    color: css変数('テキスト副'),
     position: 'relative',
     border: 'none',
     background: 'none',
     padding: 0,
-    ':hover': { color: 配色.テキスト主 },
+    ':hover': { color: css変数('テキスト主') },
 });
 
 export const 項目状態 = {
@@ -45,7 +45,7 @@ export const 項目状態 = {
 } as const;
 
 globalStyle(`${項目}[${項目状態.attribute}="${項目状態.value.active}"]`, {
-    color: 配色.テキスト主,
+    color: css変数('テキスト主'),
 });
 
 globalStyle(`${項目}[${項目状態.attribute}="${項目状態.value.active}"]::before`, {
@@ -55,7 +55,7 @@ globalStyle(`${項目}[${項目状態.attribute}="${項目状態.value.active}"]
     top: '0',
     bottom: '0',
     width: '2px',
-    backgroundColor: 配色.ブルー,
+    backgroundColor: css変数('ブルー'),
 });
 
 export const 項目ラベル = style({

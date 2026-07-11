@@ -4,6 +4,7 @@
 // data-attribute による状態スタイルは globalStyle で定義する(selectors では実行時エラー)。
 
 import { style, globalStyle } from "@vanilla-extract/css";
+import { css変数 } from "../../テーマ/テーマCSS変数";
 
 // =============================================================================
 // ペイン木のレイアウト
@@ -53,18 +54,18 @@ export const スプリッター水平 = style({
     width: "100%",
     height: "4px",
     cursor: "row-resize",
-    backgroundColor: "#3c3c3c",
+    backgroundColor: css変数("ペインスプリッター"),
     flexShrink: 0,
-    ":hover": { backgroundColor: "#007acc" },
+    ":hover": { backgroundColor: css変数("ペインアクセント") },
 });
 
 export const スプリッター垂直 = style({
     width: "4px",
     height: "100%",
     cursor: "col-resize",
-    backgroundColor: "#3c3c3c",
+    backgroundColor: css変数("ペインスプリッター"),
     flexShrink: 0,
-    ":hover": { backgroundColor: "#007acc" },
+    ":hover": { backgroundColor: css変数("ペインアクセント") },
 });
 
 // =============================================================================
@@ -81,15 +82,15 @@ export const タブ群 = style({
     minWidth: 0,
     minHeight: 0,
     overflow: "hidden",
-    backgroundColor: "#1e1e1e",
+    backgroundColor: css変数("ペイン背景"),
 });
 
 export const タブバー = style({
     display: "flex",
     flexDirection: "row",
     overflow: "auto",
-    backgroundColor: "#252526",
-    borderBottom: "1px solid #2d2d30",
+    backgroundColor: css変数("ペインタブバー背景"),
+    borderBottom: `1px solid ${css変数("ペインタブ境界線")}`,
     flexShrink: 0,
     minHeight: "32px",
 });
@@ -104,10 +105,10 @@ export const タブボタン = style({
     padding: "6px 12px",
     width: "160px",
     flexShrink: 0,
-    color: "#cccccc",
-    backgroundColor: "#2d2d30",
+    color: css変数("ペインタブテキスト"),
+    backgroundColor: css変数("ペインタブ境界線"),
     border: "none",
-    borderRight: "1px solid #1e1e1e",
+    borderRight: `1px solid ${css変数("ペイン背景")}`,
     cursor: "pointer",
     fontSize: "13px",
     whiteSpace: "nowrap",
@@ -125,9 +126,9 @@ export const タブ状態 = {
 } as const;
 
 globalStyle(`${タブボタン}[${タブ状態.attribute}="${タブ状態.value.active}"]`, {
-    backgroundColor: "#1e1e1e",
-    color: "#ffffff",
-    borderBottom: "1px solid #1e1e1e",
+    backgroundColor: css変数("ペイン背景"),
+    color: css変数("ペインタブアクティブテキスト"),
+    borderBottom: `1px solid ${css変数("ペイン背景")}`,
 });
 
 export const タブ閉じる = style({
@@ -140,12 +141,12 @@ export const タブ閉じる = style({
     width: "16px",
     height: "16px",
     borderRadius: "3px",
-    color: "#cccccc",
+    color: css変数("ペインタブテキスト"),
     cursor: "pointer",
     opacity: 0.6,
     ":hover": {
         opacity: 1,
-        backgroundColor: "#37373d",
+        backgroundColor: css変数("ペイン閉じるホバー"),
     },
 });
 
@@ -184,8 +185,8 @@ export const コンテンツアイテム = style({
 export const DnD領域ヒント = style({
     position: "fixed",
     pointerEvents: "none",
-    backgroundColor: "rgba(0, 122, 204, 0.25)",
-    border: "2px solid #007acc",
+    backgroundColor: css変数("ペインDnDヒント背景"),
+    border: `2px solid ${css変数("ペインアクセント")}`,
     boxSizing: "border-box",
     transition: "left 0.06s ease-out, top 0.06s ease-out, width 0.06s ease-out, height 0.06s ease-out",
     zIndex: 9999,

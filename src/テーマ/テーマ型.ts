@@ -17,6 +17,18 @@ export interface テーマ配色 {
     パネルテキスト主: string;
     パネルテキスト副: string;
     パネルテキスト薄: string;
+    // ステータスバー（ネイビー地に白文字）
+    ステータスバーテキスト: string;
+    // エディタペイン（タブ群・スプリッター・DnD。独自の暗色系）
+    ペイン背景: string;
+    ペインタブバー背景: string;
+    ペインタブ境界線: string;
+    ペインタブテキスト: string;
+    ペインタブアクティブテキスト: string;
+    ペインアクセント: string;
+    ペインスプリッター: string;
+    ペイン閉じるホバー: string;
+    ペインDnDヒント背景: string;
     // ブランドカラー
     ネイビー: string;
     イエロー: string;

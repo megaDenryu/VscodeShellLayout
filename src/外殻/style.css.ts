@@ -1,5 +1,6 @@
 import { style, globalStyle } from '@vanilla-extract/css';
-import { 配色, フォント } from '../テーマ/デフォルトテーマ';
+import { フォント } from '../テーマ/デフォルトテーマ';
+import { css変数 } from '../テーマ/テーマCSS変数';
 import { 表示状態 } from './表示状態';
 
 // SengenUIガイド第13条の表示状態ルール。
@@ -14,9 +15,9 @@ export const ルート = style({
     flexDirection: 'column',
     width: '100vw',
     height: '100vh',
-    backgroundColor: 配色.アプリ背景,
+    backgroundColor: css変数('アプリ背景'),
     fontFamily: フォント.標準,
-    color: 配色.クロームテキスト,
+    color: css変数('クロームテキスト'),
     overflow: 'hidden',
 });
 
@@ -36,7 +37,7 @@ export const メインエリア = style({
 
 export const 右サイドバー = style({
     width: '260px',
-    backgroundColor: 配色.パネル表面,
-    borderLeft: `1px solid ${配色.パネル境界線}`,
+    backgroundColor: css変数('パネル表面'),
+    borderLeft: `1px solid ${css変数('パネル境界線')}`,
     overflow: 'auto',
 });

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { 配色 } from '../テーマ/デフォルトテーマ';
+import { css変数 } from '../テーマ/テーマCSS変数';
 
 export const 垂直 = style({
     width: '4px',
@@ -7,7 +7,7 @@ export const 垂直 = style({
     backgroundColor: 'transparent',
     transition: 'background-color 0.15s',
     flexShrink: 0,
-    ':hover': { backgroundColor: 配色.ブルー },
+    ':hover': { backgroundColor: css変数('ブルー') },
 });
 
 export const 水平 = style({
@@ -16,5 +16,5 @@ export const 水平 = style({
     backgroundColor: 'transparent',
     transition: 'background-color 0.15s',
     flexShrink: 0,
-    ':hover': { backgroundColor: 配色.ブルー },
+    ':hover': { backgroundColor: css変数('ブルー') },
 });

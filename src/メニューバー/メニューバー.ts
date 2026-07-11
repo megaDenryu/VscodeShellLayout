@@ -17,22 +17,26 @@ export class メニューバー extends LV2HtmlComponentBase {
     constructor(
         private タイトル: string,
         private イベント: Iメニューバーイベント,
+        private トグルボタン表示: boolean = true,
     ) {
         super();
-        this._componentRoot = this._ルートを構築する(タイトル, イベント);
+        this._componentRoot = this._ルートを構築する(タイトル, イベント, トグルボタン表示);
     }
 
-    private _ルートを構築する(タイトル: string, イベント: Iメニューバーイベント): DivC {
+    private _ルートを構築する(タイトル: string, イベント: Iメニューバーイベント, トグルボタン表示: boolean): DivC {
         return (
-            div({ class: styles.バー }).childs([
-                span({ text: タイトル, class: styles.タイトル }),
-                div({ class: styles.右ボタン群 }).childs([
-                    button({ class: styles.トグルボタン })
-                        .child(パネルアイコン(16, 'currentColor'))
-                        .onClick(() => イベント.onパネルトグル()),
-                    button({ class: styles.トグルボタン })
-                        .child(サイドバーアイコン(16, 'currentColor'))
-                        .onClick(() => イベント.onサイドバートグル())])])
+            div({ class: styles.バー })
+                .child(span({ text: タイトル, class: styles.タイトル }))
+                .childIf({
+                    If: トグルボタン表示,
+                    True: () => div({ class: styles.右ボタン群 }).childs([
+                        button({ class: styles.トグルボタン })
+                            .child(パネルアイコン(16, 'currentColor'))
+                            .onClick(() => イベント.onパネルトグル()),
+                        button({ class: styles.トグルボタン })
+                            .child(サイドバーアイコン(16, 'currentColor'))
+                            .onClick(() => イベント.onサイドバートグル())]),
+                })
         );
     }
 }

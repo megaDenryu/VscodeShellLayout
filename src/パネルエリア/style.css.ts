@@ -1,5 +1,6 @@
 import { style, globalStyle } from '@vanilla-extract/css';
-import { 配色, フォント } from '../テーマ/デフォルトテーマ';
+import { フォント } from '../テーマ/デフォルトテーマ';
+import { css変数 } from '../テーマ/テーマCSS変数';
 
 export const エリア = style({
     display: 'flex',
@@ -11,9 +12,9 @@ export const タブバー = style({
     display: 'flex',
     height: '30px',
     minHeight: '30px',
-    backgroundColor: 配色.クローム背景,
-    borderTop: `1px solid ${配色.クローム境界線}`,
-    borderBottom: `1px solid ${配色.クローム境界線}`,
+    backgroundColor: css変数('クローム背景'),
+    borderTop: `1px solid ${css変数('クローム境界線')}`,
+    borderBottom: `1px solid ${css変数('クローム境界線')}`,
     overflow: 'hidden',
 });
 
@@ -23,7 +24,7 @@ export const タブ = style({
     padding: '0 12px',
     fontSize: '11px',
     fontFamily: フォント.標準,
-    color: 配色.テキスト副,
+    color: css変数('テキスト副'),
     cursor: 'pointer',
     background: 'none',
     border: 'none',
@@ -31,7 +32,7 @@ export const タブ = style({
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     userSelect: 'none',
-    ':hover': { color: 配色.テキスト主 },
+    ':hover': { color: css変数('テキスト主') },
 });
 
 export const タブ状態 = {
@@ -40,12 +41,12 @@ export const タブ状態 = {
 } as const;
 
 globalStyle(`${タブ}[${タブ状態.attribute}="${タブ状態.value.active}"]`, {
-    color: 配色.テキスト主,
-    borderBottomColor: 配色.ブルー,
+    color: css変数('テキスト主'),
+    borderBottomColor: css変数('ブルー'),
 });
 
 export const コンテンツ = style({
     flex: '1',
     overflow: 'auto',
-    backgroundColor: 配色.パネル背景,
+    backgroundColor: css変数('パネル背景'),
 });
