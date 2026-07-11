@@ -35,6 +35,9 @@ export interface DOM同期コンテキスト {
         方向: "水平" | "垂直",
         開始座標: 座標,
     ) => void;
+    // Electronでtitlebarを除去したアプリ向け。trueならタブバーの空き領域を
+    // ウィンドウドラッグ領域にする(外殻レイアウトオプションから配線される)。
+    readonly タブバードラッグ領域: boolean;
 }
 
 export function ペイン木をDOMに同期(
@@ -67,6 +70,13 @@ function タブ群ペインを構築(
             .childs([
                 div({ class: styles.タブバー })
                     .setAttribute(タブバー属性, 対象ペイン.id)
+                    .setAttributeIf({
+                        If: コンテキスト.タブバードラッグ領域,
+                        True: {
+                            attr: styles.タブバードラッグ状態.attribute,
+                            value: styles.タブバードラッグ状態.value.有効,
+                        },
+                    })
                     .childs(
                         対象ペイン.タブ一覧.map(タブ =>
                             new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト))),

@@ -240,3 +240,23 @@ describe("ヒント矩形を計算 - 視覚化とヒットテストの一致(実
         void タブID;
     });
 });
+
+describe("分割可能エディタエリア - タブバーのウィンドウドラッグ領域化", () => {
+    it("省略時(false相当)はタブバーにドラッグ属性が付かない", () => {
+        const area = new 分割可能エディタエリア();
+        area.マウントする(document.body);
+        area.タブを追加する("a", "タブA", ダミーコンテンツ("コンテンツA"));
+
+        const タブバー = area.dom.element.querySelector("[data-tab-bar]");
+        expect(タブバー?.getAttribute("data-drag-region")).toBeNull();
+    });
+
+    it("trueを渡すと、タブバーにドラッグ領域のdata属性が付く", () => {
+        const area = new 分割可能エディタエリア(true);
+        area.マウントする(document.body);
+        area.タブを追加する("a", "タブA", ダミーコンテンツ("コンテンツA"));
+
+        const タブバー = area.dom.element.querySelector("[data-tab-bar]");
+        expect(タブバー?.getAttribute("data-drag-region")).toBe("true");
+    });
+});

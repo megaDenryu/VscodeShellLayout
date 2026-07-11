@@ -15,9 +15,9 @@ export class エディタエリア extends LV2HtmlComponentBase {
     // _componentRoot を 分割可能エディタエリア そのものにすることで、ラッパー div を挟まずに済む。
     protected _componentRoot: 分割可能エディタエリア;
 
-    constructor() {
+    constructor(タブバーをウィンドウドラッグ領域にする = false) {
         super();
-        this._componentRoot = new 分割可能エディタエリア();
+        this._componentRoot = new 分割可能エディタエリア(タブバーをウィンドウドラッグ領域にする);
     }
 
     イベントを設定する(イベント: Iエディタイベント): void {

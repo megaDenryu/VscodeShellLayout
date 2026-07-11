@@ -95,6 +95,30 @@ export const タブバー = style({
     minHeight: "32px",
 });
 
+// =============================================================================
+// タブバーのウィンドウドラッグ領域化(Electron titlebar除去アプリ向け、外殻レイアウトオプション経由)
+// =============================================================================
+
+// csstype(vanilla-extractの型基盤)は -webkit-app-region を未定義のベンダープロパティとして
+// 扱う(標準ではないため)。表示状態.ts の !important 回避と同種の型境界キャストで通す。
+type ドラッグ領域スタイル = Parameters<typeof globalStyle>[1];
+
+export const タブバードラッグ状態 = {
+    attribute: "data-drag-region",
+    value: { 有効: "true" },
+} as const;
+
+globalStyle(`${タブバー}[${タブバードラッグ状態.attribute}="${タブバードラッグ状態.value.有効}"]`, {
+    WebkitAppRegion: "drag",
+    // 右端はウィンドウ操作ボタン(最小化/最大化/閉じる)のオーバーレイと重なるため、
+    // その分の余白を確保してタブがボタン群の下に潜り込まないようにする。
+    // env(titlebar-area-width)はオーバーレイを除いた「安全な」幅そのものなので、
+    // バー全幅からそれを引いた値(=オーバーレイの幅)を余白にする。
+    // titlebarOverlayが使えない環境(通常ブラウザ等)ではenv()自体が未定義になり、
+    // 内側のフォールバック calc(100% - 140px) が使われた結果、外側の計算で140pxになる。
+    paddingRight: "calc(100% - env(titlebar-area-width, calc(100% - 140px)))",
+} as unknown as ドラッグ領域スタイル);
+
 // 固定幅にしてタブ間で長さを統一。長いラベルは text-overflow: ellipsis で省略表示する。
 // 幅統一により DnD 中の挿入位置判定 (タブ中央 x の比較) が直感と一致しやすくなる。
 // transition は他タブのスライドアニメ用、ドラッグ中タブ自身は追従の即時性のため
@@ -117,7 +141,11 @@ export const タブボタン = style({
     userSelect: "none",
     transition: "transform 0.2s ease",
     willChange: "transform",
-});
+    // タブバードラッグ領域が有効な祖先の下でも、タブ自体は常にクリック/DnD操作可能にする。
+    // ドラッグ領域が無効なときは無害(-webkit-app-regionはドラッグ祖先がない限り無視される)。
+    // csstypeが -webkit-app-region 未定義のため型境界キャスト(タブバードラッグ状態と同種)。
+    WebkitAppRegion: "no-drag",
+} as unknown as Parameters<typeof style>[0]);
 
 // アクティブタブの状態スタイル(data-attribute)
 export const タブ状態 = {

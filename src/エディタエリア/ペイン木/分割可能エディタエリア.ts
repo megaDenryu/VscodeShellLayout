@@ -36,7 +36,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     private readonly _新タブ群ID採番器 = new ペインID採番器("tabs", 1);
     private readonly _分割ID採番器 = new ペインID採番器("split", 0);
 
-    constructor() {
+    constructor(private readonly _タブバーをウィンドウドラッグ領域にする = false) {
         super();
         this._ルートID = ペインIDを作る("main-root");
         this._レイアウト = 空レイアウト(this._ルートID);
@@ -195,6 +195,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
             直前にドラッグした: () => this._入力配線.直前にドラッグしたか(),
             スプリッター押下: (分割ペイン, 方向, 開始座標) =>
                 this._入力配線.スプリッター押下処理(分割ペイン, 方向, 開始座標),
+            タブバードラッグ領域: this._タブバーをウィンドウドラッグ領域にする,
         };
     }
 

@@ -15,7 +15,10 @@ export const ルート = style({
     flexDirection: 'column',
     width: '100vw',
     height: '100vh',
-    backgroundColor: css変数('アプリ背景'),
+    // background-color ではなく background ショートハンドにする。
+    // テーマ側がグラデーション（例: 'linear-gradient(180deg, #fff, #eee)'）を
+    // アプリ背景トークンに渡せるようにするため（background-colorはグラデーションを描画できない）。
+    background: css変数('アプリ背景'),
     fontFamily: フォント.標準,
     color: css変数('クロームテキスト'),
     overflow: 'hidden',
