@@ -1,56 +1,45 @@
-import { div, DivC, ButtonC, LV2HtmlComponentBase } from "sengen-ui";
+import { div, DivC, LV2部品集約Base } from "sengen-ui";
 import * as styles from './style.css';
-import { タブ状態 } from './style.css';
-import { タブバーView, type タブ項目 } from '../エディタエリア/タブバー';
+import { パネルエリア部品 } from './パネルエリア部品';
+import type { タブ項目 } from './タブストリップ';
 
 // =============================================================================
-// Orchestrator
+// Orchestrator（LV2部品集約: 子にLV2部品（タブストリップ）を含むため）
 // =============================================================================
 
-export class パネルエリア extends LV2HtmlComponentBase {
+export class パネルエリア extends LV2部品集約Base<パネルエリア部品> {
     protected _componentRoot: DivC;
-    private _タブ要素マップ = new Map<string, ButtonC>();
-    private _コンテンツ: DivC;
+    private readonly _部品: パネルエリア部品;
     private _選択中ID: string | null = null;
 
-    constructor(private タブ一覧: タブ項目[]) {
+    constructor(タブ一覧: タブ項目[]) {
         super();
-        this._コンテンツ = div({ class: styles.コンテンツ });
-        this._componentRoot = this.createComponentRoot();
-        if (this.タブ一覧.length > 0) {
-            this.タブを選択する(this.タブ一覧[0].id);
+        this._部品 = パネルエリア部品.作る(タブ一覧);
+        this._componentRoot = this._ルートを構築する(this._部品);
+        if (タブ一覧.length > 0) {
+            this.タブを選択する(タブ一覧[0].id);
         }
     }
 
-    private createComponentRoot(): DivC {
+    protected _ルートを構築する(部品: パネルエリア部品): DivC {
         return (
             div({ class: styles.エリア })
                 .setStyleCSS({ height: '200px' })
                 .childs([
-                    タブバーView(
-                        this.タブ一覧,
-                        styles.タブバー,
-                        styles.タブ,
-                        タブ状態,
-                        (id) => this.タブを選択する(id),
-                        (id, 要素) => this._タブ要素マップ.set(id, 要素),
-                    ),
-                    this._コンテンツ])
+                    部品.タブストリップ.配線する({
+                        on選択: (id) => this.タブを選択する(id),
+                    }),
+                    部品.コンテンツ])
         );
     }
 
     タブを選択する(id: string): void {
         this._選択中ID = id;
-        this._タブ要素マップ.forEach((要素, タブID) => {
-            要素.setAttribute(
-                タブ状態.attribute,
-                タブID === id ? タブ状態.value.active : タブ状態.value.inactive,
-            );
-        });
+        this._部品.タブストリップ.選択する(id);
     }
 
     コンテンツを取得する(): DivC {
-        return this._コンテンツ;
+        return this._部品.コンテンツ;
     }
 
     高さを変更する(delta: number): void {

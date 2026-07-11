@@ -31,9 +31,7 @@ export const タブ = style({
     border: 'none',
     borderBottom: '2px solid transparent',
     whiteSpace: 'nowrap',
-    selectors: {
-        '&:hover': { color: 配色.テキスト主 },
-    },
+    ':hover': { color: 配色.テキスト主 },
 });
 
 export const タブ状態 = {

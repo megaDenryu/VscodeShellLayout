@@ -20,4 +20,4 @@ export { アクティビティバー, type アクティビティ項目 } from '.
 export { アクティビティID } from './アクティビティバー/アクティビティID';
 export { メニューバー } from './メニューバー/メニューバー';
 export { スプリッター } from './スプリッター/スプリッター';
-export type { タブ項目 } from './エディタエリア/タブバー';
+export type { タブ項目 } from './パネルエリア/タブストリップ';

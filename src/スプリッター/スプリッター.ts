@@ -19,10 +19,10 @@ export class スプリッター extends LV2HtmlComponentBase {
         private ハンドラ: Iスプリッターリサイズ,
     ) {
         super();
-        this._componentRoot = this.createComponentRoot();
+        this._componentRoot = this._ルートを構築する();
     }
 
-    private createComponentRoot(): DivC {
+    private _ルートを構築する(): DivC {
         return (
             div({ class: this.方向 === '水平' ? styles.水平 : styles.垂直 })
                 .addTypedEventListener('mousedown', (e) => this.ドラッグ開始(e))
@@ -45,7 +45,8 @@ export class スプリッター extends LV2HtmlComponentBase {
         const onUp = () => {
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
-            // Why: ドラッグ中はマウスがスプリッター外に出てもイベントを受信する必要がある
+            // 注意: ドラッグ中はマウスがスプリッター外に出てもイベントを受信する必要があるため、
+            // this._componentRoot ではなく document に配線している
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
         };

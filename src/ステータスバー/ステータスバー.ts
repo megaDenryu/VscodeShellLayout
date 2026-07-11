@@ -3,39 +3,25 @@ import type { HtmlComponentBase } from "sengen-ui";
 import * as styles from './style.css';
 
 // =============================================================================
-// 純粋関数コンポーネント群
-// =============================================================================
-
-interface ステータスバーViewProps {
-    左セクション: DivC;
-    右セクション: DivC;
-}
-
-function ステータスバーView({ 左セクション, 右セクション }: ステータスバーViewProps): DivC {
-    return (
-        div({ class: styles.バー }).childs([
-            左セクション,
-            右セクション])
-    );
-}
-
-// =============================================================================
-// Orchestrator
+// Orchestrator（LV2素部品: LV1のみの単純な複合なので構築はクラス内に閉じる）
 // =============================================================================
 
 export class ステータスバー extends LV2HtmlComponentBase {
     protected _componentRoot: DivC;
-    private _左セクション: DivC;
-    private _右セクション: DivC;
+    private _左セクション!: DivC;
+    private _右セクション!: DivC;
 
     constructor() {
         super();
-        this._左セクション = div({ class: styles.セクション });
-        this._右セクション = div({ class: styles.セクション });
-        this._componentRoot = ステータスバーView({
-            左セクション: this._左セクション,
-            右セクション: this._右セクション,
-        });
+        this._componentRoot = this._ルートを構築する();
+    }
+
+    private _ルートを構築する(): DivC {
+        return (
+            div({ class: styles.バー }).childs([
+                div({ class: styles.セクション }).tap(d => { this._左セクション = d; }),
+                div({ class: styles.セクション }).tap(d => { this._右セクション = d; })])
+        );
     }
 
     左にテキストを追加する(テキスト: string): this {

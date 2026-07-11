@@ -36,9 +36,7 @@ export const 項目 = style({
     border: 'none',
     background: 'none',
     padding: 0,
-    selectors: {
-        '&:hover': { color: 配色.テキスト主 },
-    },
+    ':hover': { color: 配色.テキスト主 },
 });
 
 export const 項目状態 = {

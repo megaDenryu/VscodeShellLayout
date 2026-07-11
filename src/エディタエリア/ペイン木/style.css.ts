@@ -55,9 +55,7 @@ export const スプリッター水平 = style({
     cursor: "row-resize",
     backgroundColor: "#3c3c3c",
     flexShrink: 0,
-    selectors: {
-        "&:hover": { backgroundColor: "#007acc" },
-    },
+    ":hover": { backgroundColor: "#007acc" },
 });
 
 export const スプリッター垂直 = style({
@@ -66,9 +64,7 @@ export const スプリッター垂直 = style({
     cursor: "col-resize",
     backgroundColor: "#3c3c3c",
     flexShrink: 0,
-    selectors: {
-        "&:hover": { backgroundColor: "#007acc" },
-    },
+    ":hover": { backgroundColor: "#007acc" },
 });
 
 // =============================================================================
@@ -147,11 +143,9 @@ export const タブ閉じる = style({
     color: "#cccccc",
     cursor: "pointer",
     opacity: 0.6,
-    selectors: {
-        "&:hover": {
-            opacity: 1,
-            backgroundColor: "#37373d",
-        },
+    ":hover": {
+        opacity: 1,
+        backgroundColor: "#37373d",
     },
 });
 

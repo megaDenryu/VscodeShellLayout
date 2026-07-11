@@ -31,9 +31,7 @@ export const タブ = style({
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     userSelect: 'none',
-    selectors: {
-        '&:hover': { color: 配色.テキスト主 },
-    },
+    ':hover': { color: 配色.テキスト主 },
 });
 
 export const タブ状態 = {

@@ -37,10 +37,8 @@ export const トグルボタン = style({
     cursor: 'pointer',
     color: 配色.テキスト副,
     padding: 0,
-    selectors: {
-        '&:hover': {
-            backgroundColor: 配色.ホバー背景,
-            color: 配色.テキスト主,
-        },
+    ':hover': {
+        backgroundColor: 配色.ホバー背景,
+        color: 配色.テキスト主,
     },
 });

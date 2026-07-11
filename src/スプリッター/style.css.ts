@@ -7,9 +7,7 @@ export const 垂直 = style({
     backgroundColor: 'transparent',
     transition: 'background-color 0.15s',
     flexShrink: 0,
-    selectors: {
-        '&:hover': { backgroundColor: 配色.ブルー },
-    },
+    ':hover': { backgroundColor: 配色.ブルー },
 });
 
 export const 水平 = style({
@@ -18,7 +16,5 @@ export const 水平 = style({
     backgroundColor: 'transparent',
     transition: 'background-color 0.15s',
     flexShrink: 0,
-    selectors: {
-        '&:hover': { backgroundColor: 配色.ブルー },
-    },
+    ':hover': { backgroundColor: 配色.ブルー },
 });
