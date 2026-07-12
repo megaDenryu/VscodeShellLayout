@@ -36,6 +36,8 @@ export const テーマCSS変数名: { readonly [K in keyof テーマ配色]: `--
     ネイビー: '--vsl-navy',
     イエロー: '--vsl-yellow',
     ブルー: '--vsl-blue',
+    基本文字ウェイト: '--vsl-font-weight-base',
+    基本フォントファミリ: '--vsl-font-family-base',
 };
 
 // style.css.ts から呼ぶヘルパー。CSS変数が未設定（テーマ未指定）の間は

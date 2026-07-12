@@ -1,5 +1,10 @@
 import type { テーマ配色, テーマフォント, テーマ } from './テーマ型';
 
+export const フォント: テーマフォント = {
+    標準: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    モノ: '"Cascadia Code", "Fira Code", "JetBrains Mono", monospace',
+};
+
 export const 配色: テーマ配色 = {
     // 外殻フレーム（ダーク）
     アプリ背景: '#0a1628',
@@ -35,11 +40,9 @@ export const 配色: テーマ配色 = {
     ネイビー: '#003A70',
     イエロー: '#FFCB05',
     ブルー: '#3D7DCA',
-};
-
-export const フォント: テーマフォント = {
-    標準: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    モノ: '"Cascadia Code", "Fira Code", "JetBrains Mono", monospace',
+    // タイポグラフィ: 現行互換のためフォント.標準・ウェイト400をそのまま既定値にする
+    基本文字ウェイト: '400',
+    基本フォントファミリ: フォント.標準,
 };
 
 export const デフォルトテーマ: テーマ = { 配色, フォント };

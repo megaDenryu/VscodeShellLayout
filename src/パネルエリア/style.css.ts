@@ -1,5 +1,4 @@
 import { style, globalStyle } from '@vanilla-extract/css';
-import { フォント } from '../テーマ/デフォルトテーマ';
 import { css変数 } from '../テーマ/テーマCSS変数';
 
 export const エリア = style({
@@ -23,7 +22,8 @@ export const タブ = style({
     alignItems: 'center',
     padding: '0 12px',
     fontSize: '11px',
-    fontFamily: フォント.標準,
+    fontFamily: css変数('基本フォントファミリ'),
+    fontWeight: css変数('基本文字ウェイト'),
     color: css変数('テキスト副'),
     cursor: 'pointer',
     background: 'none',

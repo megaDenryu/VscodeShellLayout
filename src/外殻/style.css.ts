@@ -1,5 +1,4 @@
 import { style, globalStyle } from '@vanilla-extract/css';
-import { フォント } from '../テーマ/デフォルトテーマ';
 import { css変数 } from '../テーマ/テーマCSS変数';
 import { 表示状態 } from './表示状態';
 
@@ -19,7 +18,8 @@ export const ルート = style({
     // テーマ側がグラデーション（例: 'linear-gradient(180deg, #fff, #eee)'）を
     // アプリ背景トークンに渡せるようにするため（background-colorはグラデーションを描画できない）。
     background: css変数('アプリ背景'),
-    fontFamily: フォント.標準,
+    fontFamily: css変数('基本フォントファミリ'),
+    fontWeight: css変数('基本文字ウェイト'),
     color: css変数('クロームテキスト'),
     overflow: 'hidden',
 });

@@ -1,5 +1,4 @@
 import { style } from '@vanilla-extract/css';
-import { フォント } from '../テーマ/デフォルトテーマ';
 import { css変数 } from '../テーマ/テーマCSS変数';
 
 export const バー = style({
@@ -21,7 +20,8 @@ export const セクション = style({
 
 export const テキスト = style({
     fontSize: '11px',
-    fontFamily: フォント.標準,
+    fontFamily: css変数('基本フォントファミリ'),
+    fontWeight: css変数('基本文字ウェイト'),
     color: css変数('ステータスバーテキスト'),
     userSelect: 'none',
     lineHeight: '22px',
