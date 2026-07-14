@@ -64,3 +64,15 @@ export const 項目ラベル = style({
     userSelect: 'none',
     lineHeight: '1',
 });
+
+// 狭幅対応（オプトイン、外殻レイアウトオプション「狭幅ではラベルを省略する」参照）:
+// data-狭幅ラベル省略="true" を明示指定したアプリだけ、狭幅ビューポートでラベルを
+// 隠す（アイコンのみ表示。ラベルはtitle属性のツールチップとして残す）。属性未指定の
+// 既存アプリ（Jimbo/Pokemon）はメディアクエリの対象外なので挙動は一切変わらない。
+globalStyle(`${バー}[data-狭幅ラベル省略="true"] ${項目ラベル}`, {
+    '@media': {
+        'screen and (max-width: 767px)': {
+            display: 'none',
+        },
+    },
+});

@@ -9,6 +9,7 @@ export class アクティビティ項目ボタン extends DivC {
     constructor(項目: アクティビティ項目, on選択: () => void) {
         super({ class: styles.項目 });
         this.setAttribute(項目状態.attribute, 項目状態.value.inactive)
+            .setTooltip(項目.ラベル)
             .childs([
                 項目.アイコン(20, 'currentColor'),
                 span({ text: 項目.ラベル, class: styles.項目ラベル })])

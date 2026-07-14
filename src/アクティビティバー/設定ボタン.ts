@@ -6,7 +6,7 @@ import { 設定アイコン } from '../アイコン/アイコン定義';
 export class 設定ボタン extends DivC {
     constructor(on設定: () => void) {
         super({ class: styles.項目 });
-        this.childs([
+        this.setTooltip('設定').childs([
             設定アイコン(18, 'currentColor'),
             span({ text: "設定", class: styles.項目ラベル })])
             .addTypedEventListener('click', on設定);

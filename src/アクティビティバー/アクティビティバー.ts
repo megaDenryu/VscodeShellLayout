@@ -34,6 +34,10 @@ export class アクティビティバー extends LV2HtmlComponentBase {
         private readonly _項目一覧: アクティビティ項目[],
         // 未指定時は固定の設定ボタン（旧挙動）を表示する。明示指定すると完全に置き換わる。
         private readonly _下部項目一覧?: アクティビティ項目[],
+        // オプトイン（省略時false=旧挙動）。trueのアプリだけ狭幅ビューポートでラベルを
+        // 隠す（アイコンのみ表示。ラベルはtitle属性のツールチップへ移す）。
+        // 参照: 外殻レイアウトオプション「狭幅ではラベルを省略する」
+        private readonly _狭幅ではラベルを省略する?: boolean,
     ) {
         super();
         this._componentRoot = this._ルートを構築する(this._項目一覧, this._下部項目一覧);
@@ -44,16 +48,21 @@ export class アクティビティバー extends LV2HtmlComponentBase {
 
     private _ルートを構築する(項目一覧: アクティビティ項目[], 下部項目一覧: アクティビティ項目[] | undefined): DivC {
         return (
-            div({ class: styles.バー }).childs([
-                div({ class: styles.項目群 }).childs(
-                    項目一覧.map(該当項目 =>
-                        new アクティビティ項目ボタン(該当項目, () => this.選択する(該当項目.id))
-                            .tap(要素 => { this._項目ボタン一覧.push(要素); }))),
-                div({ class: styles.下部 }).childs(
-                    下部項目一覧
-                        ? 下部項目一覧.map(該当項目 =>
-                              new アクティビティ項目ボタン(該当項目, () => this._イベント?.on選択(該当項目.id)))
-                        : [new 設定ボタン(() => this._on設定?.())])])
+            div({ class: styles.バー })
+                .setAttributeIf({
+                    If: this._狭幅ではラベルを省略する === true,
+                    True: { attr: 'data-狭幅ラベル省略', value: 'true' },
+                })
+                .childs([
+                    div({ class: styles.項目群 }).childs(
+                        項目一覧.map(該当項目 =>
+                            new アクティビティ項目ボタン(該当項目, () => this.選択する(該当項目.id))
+                                .tap(要素 => { this._項目ボタン一覧.push(要素); }))),
+                    div({ class: styles.下部 }).childs(
+                        下部項目一覧
+                            ? 下部項目一覧.map(該当項目 =>
+                                  new アクティビティ項目ボタン(該当項目, () => this._イベント?.on選択(該当項目.id)))
+                            : [new 設定ボタン(() => this._on設定?.())])])
         );
     }
 
