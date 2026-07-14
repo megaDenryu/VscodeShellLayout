@@ -11,6 +11,7 @@ import {
 import { 適用, 木の全ペイン, タブを持つペインを探す } from "./レイアウト操作";
 import {
     ペイン木をDOMに同期,
+    タブID属性,
     type DOM同期コンテキスト,
 } from "./DOM同期";
 import { ペイン木入力配線 } from "./ペイン木入力配線";
@@ -147,7 +148,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
         const 結果 = 適用(this._レイアウト, { kind: "タブ選択", タブ: タブID値 });
         if (結果.kind === "成功") {
             this._レイアウト = 結果.新レイアウト;
-            this._再描画();
+            this._選択状態のみ反映();
             this._イベント?.onタブ選択(id);
         }
     }
@@ -184,6 +185,35 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
 
     private _再描画(): void {
         ペイン木をDOMに同期(this._メイン領域, this._レイアウト.メインペイン, this._DOM同期コンテキスト());
+    }
+
+    // タブの追加/削除/分割/移動を伴わない「選択の切り替えだけ」は最頻出の操作だが、
+    // _再描画() の全再構築(親.clearChildren() → ペインを構築 で作り直したツリーを再接続)を
+    // 経由すると、既存のコンテンツDOMノード(iframe等)が一度documentから切断されてから
+    // 再接続される。iframeはdocumentから切断された時点で読み込み中のbrowsing contextが
+    // 破棄される仕様のため、切断→再接続のたびに読み込みが最初からやり直しになり、
+    // AgentRoomタブ(iframeでホストする内容)のようなタブがタブ切替のたびに状態を失っていた
+    // (Fudaba札#51「タブAからタブBに移動して、またタブAに戻ってくると状態がリセットされる」)。
+    // 選択だけの変更はDOM構造(どの要素がどの親に属するか)を変える必要がないため、
+    // 既存ノードの親子関係には触れず、表示中/非表示の切り替えとタブボタンの見た目だけを
+    // 直接書き換える。タブの追加・削除・分割・移動は新規コンテンツの初回接続やペイン形状の
+    // 組み替えを伴い、全再構築のほうが単純で安全なため、引き続き _再描画() を使う。
+    private _選択状態のみ反映(): void {
+        for (const ペイン of 木の全ペイン(this._レイアウト.メインペイン)) {
+            if (ペイン.kind !== "タブ群") continue;
+            for (const タブ of ペイン.タブ一覧) {
+                const 選択中か = ペイン.選択中 === タブ.id;
+                this._コンテンツ管理.get(タブ.id)?.setStyleCSS({ display: 選択中か ? "flex" : "none" });
+
+                const ボタン要素 = this._メイン領域.dom.element.querySelector(`button[${タブID属性}="${タブ.id}"]`);
+                if (ボタン要素 instanceof HTMLElement) {
+                    ボタン要素.setAttribute(
+                        styles.タブ状態.attribute,
+                        選択中か ? styles.タブ状態.value.active : styles.タブ状態.value.inactive,
+                    );
+                }
+            }
+        }
     }
 
     private _DOM同期コンテキスト(): DOM同期コンテキスト {
