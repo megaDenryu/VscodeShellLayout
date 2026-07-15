@@ -127,12 +127,13 @@ export const タブボタン = style({
     display: "inline-flex",
     alignItems: "center",
     padding: "6px 12px",
-    width: "160px",
+    flex: 1,
+    minWidth: 0,
     flexShrink: 0,
     color: css変数("ペインタブテキスト"),
     backgroundColor: css変数("ペインタブ境界線"),
     border: "none",
-    borderRight: `1px solid ${css変数("ペイン背景")}`,
+    borderRight: "none",
     cursor: "pointer",
     fontSize: "13px",
     whiteSpace: "nowrap",
@@ -194,10 +195,11 @@ export const タブ内ボタン = style({
     display: "inline-flex",
     alignItems: "center",
     alignSelf: "stretch",
-    margin: "3px 4px 3px 2px",
-    padding: "0 10px",
-    border: `1px solid ${css変数("ペインタブ境界線")}`,
-    borderRadius: "4px",
+    margin: "0 4px 0 0",
+    padding: "0 8px",
+    border: "none",
+    borderLeft: `1px solid ${css変数("ペインタブ境界線")}`,
+    borderRadius: 0,
     color: css変数("ペインタブテキスト"),
     backgroundColor: "transparent",
     cursor: "pointer",
@@ -210,10 +212,18 @@ export const タブ内ボタン = style({
 export const タブ項目 = style({
     display: "inline-flex",
     alignItems: "stretch",
+    width: "190px",
+    minHeight: "32px",
+    boxSizing: "border-box",
     flexShrink: 0,
-    backgroundColor: "transparent",
+    backgroundColor: css変数("ペインタブ境界線"),
+    borderRight: `1px solid ${css変数("ペイン背景")}`,
     transition: "transform 0.2s ease",
     willChange: "transform",
+});
+
+globalStyle(`${タブ項目}:has(${タブボタン}[${タブ状態.attribute}="${タブ状態.value.active}"])`, {
+    backgroundColor: css変数("パネル表面"),
 });
 
 export const コンテンツエリア = style({
