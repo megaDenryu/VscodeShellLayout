@@ -3,7 +3,7 @@
 // 動的生成される項目自体を独立したクラスに切り出す第4条の原則に従い、
 // 「引数を受けてDOMツリーを返す関数」だったものをLV1拡張クラスへ昇格した。
 
-import { ButtonC, SpanC } from "sengen-ui";
+import { ButtonC, SpanC, icon } from "sengen-ui";
 import type { タブID } from "./レイアウト型";
 import type { DOM同期コンテキスト } from "./DOM同期";
 import { タブID属性 } from "./DOM同期";
@@ -12,6 +12,7 @@ import * as styles from "./style.css";
 export interface タブ内ボタン定義 {
     readonly id: string;
     readonly ラベル: string;
+    readonly アイコン?: "再読み込み";
     readonly onクリック: () => void;
 }
 
@@ -45,9 +46,20 @@ export class タブボタン extends ButtonC {
 
 export class タブ内ボタン extends ButtonC {
     constructor(定義: タブ内ボタン定義) {
-        super({ text: 定義.ラベル, class: styles.タブ内ボタン });
+        super({ class: styles.タブ内ボタン });
         this.setAttribute("data-tab-action", 定義.id)
+            .setAttribute("aria-label", 定義.ラベル)
+            .setAttribute("title", 定義.ラベル)
             .onClick(() => 定義.onクリック());
+        if (定義.アイコン === "再読み込み") {
+            this.child(icon({
+                size: 15,
+                color: "currentColor",
+                paths: ["M21 12a9 9 0 1 1-2.64-6.36L21 8", "M21 3v5h-5"],
+            }));
+        } else {
+            this.setTextContent(定義.ラベル);
+        }
         this.addTypedEventListener("pointerdown", (e: PointerEvent) => e.stopPropagation());
     }
 }

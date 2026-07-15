@@ -59,6 +59,10 @@ export class エディタエリア extends LV2HtmlComponentBase {
         this._componentRoot.タブ内ボタンを追加する(タブid, ボタンid, ラベル, onクリック);
     }
 
+    タブ再読み込みボタンを追加する(タブid: string, onクリック: () => void): void {
+        this._componentRoot.タブ再読み込みボタンを追加する(タブid, onクリック);
+    }
+
     選択中タブID(): string | null {
         return this._componentRoot.選択中タブID();
     }

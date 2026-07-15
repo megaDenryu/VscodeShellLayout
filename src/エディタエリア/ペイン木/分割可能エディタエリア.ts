@@ -165,13 +165,18 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
         ボタンid: string,
         ラベル: string,
         onクリック: () => void,
+        アイコン?: "再読み込み",
     ): void {
         const タブID値 = タブIDを作る(タブid);
         if (!this._コンテンツ管理.has(タブID値)) return;
         const 一覧 = this._タブ内ボタン管理.get(タブID値) ?? [];
         if (一覧.some(ボタン => ボタン.id === ボタンid)) return;
-        this._タブ内ボタン管理.set(タブID値, [...一覧, { id: ボタンid, ラベル, onクリック }]);
+        this._タブ内ボタン管理.set(タブID値, [...一覧, { id: ボタンid, ラベル, アイコン, onクリック }]);
         this._再描画();
+    }
+
+    タブ再読み込みボタンを追加する(タブid: string, onクリック: () => void): void {
+        this.タブ内ボタンを追加する(タブid, "reload", "更新", onクリック, "再読み込み");
     }
 
     イベントを設定する(イベント: I分割可能エディタイベント): void {
