@@ -11,7 +11,7 @@ import { type DivC } from "sengen-ui";
 import { タブを持つペインを探す } from "./レイアウト操作";
 import type { レイアウト, タブ群ペイン, タブID } from "./レイアウト型";
 import type { DnD状態, ドロップターゲット, ペイン矩形情報 } from "./DnD制御";
-import { タブID属性 } from "./DOM同期";
+import { タブ項目属性 } from "./DOM同期";
 
 export class タブ視覚効果 {
     constructor(private readonly _メイン領域: DivC) {}
@@ -90,8 +90,8 @@ export class タブ視覚効果 {
     // 全タブの transform をクリア。transition は CSS (style.css.ts) 側に静的定義済。
     // ドラッグタブに transition: none を一時上書きしていた可能性があるため、inline 値もクリアする。
     全タブ位置をリセット(): void {
-        const 全ボタン = this._メイン領域.dom.element.querySelectorAll<HTMLElement>(`button[${タブID属性}]`);
-        全ボタン.forEach(b => {
+        const 全タブ項目 = this._メイン領域.dom.element.querySelectorAll<HTMLElement>(`[${タブ項目属性}]`);
+        全タブ項目.forEach(b => {
             b.style.transform = "";
             b.style.transition = "";
         });
@@ -126,7 +126,7 @@ export class タブ視覚効果 {
     }
 
     private _タブ要素を取得(タブ: タブID): HTMLElement | null {
-        const el = this._メイン領域.dom.element.querySelector(`button[${タブID属性}="${タブ}"]`);
+        const el = this._メイン領域.dom.element.querySelector(`[${タブ項目属性}="${タブ}"]`);
         return el instanceof HTMLElement ? el : null;
     }
 }

@@ -207,6 +207,15 @@ export const タブ内ボタン = style({
     ":hover": { backgroundColor: css変数("ペイン閉じるホバー") },
 } as unknown as Parameters<typeof style>[0]);
 
+export const タブ項目 = style({
+    display: "inline-flex",
+    alignItems: "stretch",
+    flexShrink: 0,
+    backgroundColor: "transparent",
+    transition: "transform 0.2s ease",
+    willChange: "transform",
+});
+
 export const コンテンツエリア = style({
     flex: 1,
     // minHeight:0 で flex 子の最小サイズ制約を解く。これがないと内部コンテンツが

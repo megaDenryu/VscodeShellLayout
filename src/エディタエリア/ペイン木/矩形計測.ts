@@ -5,7 +5,7 @@
 import { type DivC } from "sengen-ui";
 import { タブIDを作る, type レイアウト, type ペインID, type タブID } from "./レイアウト型";
 import { 木の全ペイン } from "./レイアウト操作";
-import { ペインID属性, タブID属性, タブバー属性 } from "./DOM同期";
+import { ペインID属性, タブ項目属性, タブバー属性 } from "./DOM同期";
 import type { ペイン矩形情報, 矩形 } from "./DnD制御";
 
 export class ペイン木矩形計測器 {
@@ -49,10 +49,10 @@ export class ペイン木矩形計測器 {
     private _タブ矩形一覧を計測(ペインID値: ペインID): { タブ: タブID; 矩形: 矩形 }[] {
         const ペイン要素 = this._メイン領域.dom.element.querySelector(`[${ペインID属性}="${ペインID値}"]`);
         if (!(ペイン要素 instanceof HTMLElement)) return [];
-        const ボタン群 = ペイン要素.querySelectorAll<HTMLElement>(`button[${タブID属性}]`);
+        const タブ項目群 = ペイン要素.querySelectorAll<HTMLElement>(`[${タブ項目属性}]`);
         const 結果: { タブ: タブID; 矩形: 矩形 }[] = [];
-        ボタン群.forEach(b => {
-            const id = b.getAttribute(タブID属性);
+        タブ項目群.forEach(b => {
+            const id = b.getAttribute(タブ項目属性);
             if (id === null) return;
             const r = b.getBoundingClientRect();
             if (r.width === 0 && r.height === 0) return;

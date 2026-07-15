@@ -19,6 +19,7 @@ import type { 座標 } from "./DnD制御";
 // レイアウト型のペイン ID と DOM 要素を 1:1 対応させる必要がある。
 export const ペインID属性 = "data-pane-id";
 export const タブID属性 = "data-tab-id";
+export const タブ項目属性 = "data-tab-item-id";
 // タブバー要素を逆引きしてタブバー矩形を計測する用。タブバー内の押下は端ゾーン判定をスキップし
 // 必ずタブ群挿入として扱うため、配線層が DOM からタブバー矩形を取得する。
 export const タブバー属性 = "data-tab-bar";
@@ -78,12 +79,13 @@ function タブ群ペインを構築(
                             value: styles.タブバードラッグ状態.value.有効,
                         },
                     })
-                    .childs([
-                        ...対象ペイン.タブ一覧.map(タブ =>
-                            new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト)),
-                        ...対象ペイン.タブ一覧.flatMap(タブ =>
-                            コンテキスト.タブ内ボタン取得(タブ.id).map(定義 => new タブ内ボタン(定義))),
-                    ]),
+                    .childs(対象ペイン.タブ一覧.map(タブ =>
+                        div({ class: styles.タブ項目 })
+                            .setAttribute(タブ項目属性, タブ.id)
+                            .childs([
+                                new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト),
+                                ...コンテキスト.タブ内ボタン取得(タブ.id).map(定義 => new タブ内ボタン(定義)),
+                            ]))),
                 div({ class: styles.コンテンツエリア }).childs(
                     対象ペイン.タブ一覧.flatMap(タブ => {
                         const コンテンツ = コンテキスト.コンテンツ取得(タブ.id);
