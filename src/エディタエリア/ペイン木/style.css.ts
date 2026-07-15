@@ -190,6 +190,23 @@ export const タブ閉じる = style({
     },
 });
 
+export const タブ内ボタン = style({
+    display: "inline-flex",
+    alignItems: "center",
+    alignSelf: "stretch",
+    margin: "3px 4px 3px 2px",
+    padding: "0 10px",
+    border: `1px solid ${css変数("ペインタブ境界線")}`,
+    borderRadius: "4px",
+    color: css変数("ペインタブテキスト"),
+    backgroundColor: "transparent",
+    cursor: "pointer",
+    fontSize: "12px",
+    whiteSpace: "nowrap",
+    WebkitAppRegion: "no-drag",
+    ":hover": { backgroundColor: css変数("ペイン閉じるホバー") },
+} as unknown as Parameters<typeof style>[0]);
+
 export const コンテンツエリア = style({
     flex: 1,
     // minHeight:0 で flex 子の最小サイズ制約を解く。これがないと内部コンテンツが

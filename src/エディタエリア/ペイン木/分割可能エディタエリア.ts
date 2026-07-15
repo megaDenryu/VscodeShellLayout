@@ -14,6 +14,7 @@ import {
     タブID属性,
     type DOM同期コンテキスト,
 } from "./DOM同期";
+import type { タブ内ボタン定義 } from "./タブボタン";
 import { ペイン木入力配線 } from "./ペイン木入力配線";
 import { ペインID採番器 } from "./ID採番器";
 import * as styles from "./style.css";
@@ -31,6 +32,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     private readonly _ルートID: ペインID;
     private _レイアウト: レイアウト;
     private readonly _コンテンツ管理 = new Map<タブID, HtmlComponentBase>();
+    private readonly _タブ内ボタン管理 = new Map<タブID, タブ内ボタン定義[]>();
     private _イベント: I分割可能エディタイベント | null = null;
 
     private readonly _入力配線: ペイン木入力配線;
@@ -136,6 +138,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
         if (結果.kind === "成功") {
             this._レイアウト = 結果.新レイアウト;
             this._コンテンツ管理.delete(タブID値);
+            this._タブ内ボタン管理.delete(タブID値);
             this._再描画();
             this._イベント?.onタブ閉じる(id);
             const 新選択 = this.選択中タブID();
@@ -155,6 +158,20 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
 
     タブが存在するか(id: string): boolean {
         return this._コンテンツ管理.has(タブIDを作る(id));
+    }
+
+    タブ内ボタンを追加する(
+        タブid: string,
+        ボタンid: string,
+        ラベル: string,
+        onクリック: () => void,
+    ): void {
+        const タブID値 = タブIDを作る(タブid);
+        if (!this._コンテンツ管理.has(タブID値)) return;
+        const 一覧 = this._タブ内ボタン管理.get(タブID値) ?? [];
+        if (一覧.some(ボタン => ボタン.id === ボタンid)) return;
+        this._タブ内ボタン管理.set(タブID値, [...一覧, { id: ボタンid, ラベル, onクリック }]);
+        this._再描画();
     }
 
     イベントを設定する(イベント: I分割可能エディタイベント): void {
@@ -219,6 +236,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     private _DOM同期コンテキスト(): DOM同期コンテキスト {
         return {
             コンテンツ取得: タブ => this._コンテンツ管理.get(タブ) ?? null,
+            タブ内ボタン取得: タブ => this._タブ内ボタン管理.get(タブ) ?? [],
             タブクリック: タブ => this.タブを選択する(タブ),
             タブ閉じるクリック: タブ => this.タブを閉じる(タブ),
             DnD押下: (タブ, 座標) => this._入力配線.DnD押下処理(タブ, 座標),
@@ -233,6 +251,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
         this._入力配線.dispose();
         // コンテンツ実体は外部所有 (タブを追加する で渡されたもの)、ここでは dispose しない。
         this._コンテンツ管理.clear();
+        this._タブ内ボタン管理.clear();
     }
 }
 

@@ -50,6 +50,15 @@ export class エディタエリア extends LV2HtmlComponentBase {
         return this._componentRoot.タブが存在するか(id);
     }
 
+    タブ内ボタンを追加する(
+        タブid: string,
+        ボタンid: string,
+        ラベル: string,
+        onクリック: () => void,
+    ): void {
+        this._componentRoot.タブ内ボタンを追加する(タブid, ボタンid, ラベル, onクリック);
+    }
+
     選択中タブID(): string | null {
         return this._componentRoot.選択中タブID();
     }

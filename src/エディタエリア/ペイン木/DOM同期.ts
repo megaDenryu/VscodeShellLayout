@@ -10,7 +10,7 @@
 
 import { div, type DivC, type HtmlComponentBase } from "sengen-ui";
 import type { ペイン, タブID, ペインID } from "./レイアウト型";
-import { タブボタン } from "./タブボタン";
+import { タブボタン, タブ内ボタン, type タブ内ボタン定義 } from "./タブボタン";
 import { 左右分割ペインを構築, 上下分割ペインを構築 } from "./分割ペイン構築";
 import * as styles from "./style.css";
 import type { 座標 } from "./DnD制御";
@@ -25,6 +25,7 @@ export const タブバー属性 = "data-tab-bar";
 
 export interface DOM同期コンテキスト {
     readonly コンテンツ取得: (タブ: タブID) => HtmlComponentBase | null;
+    readonly タブ内ボタン取得: (タブ: タブID) => readonly タブ内ボタン定義[];
     readonly タブクリック: (タブ: タブID) => void;
     readonly タブ閉じるクリック: (タブ: タブID) => void;
     readonly DnD押下: (タブ: タブID, 座標: 座標) => void;
@@ -77,9 +78,12 @@ function タブ群ペインを構築(
                             value: styles.タブバードラッグ状態.value.有効,
                         },
                     })
-                    .childs(
-                        対象ペイン.タブ一覧.map(タブ =>
-                            new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト))),
+                    .childs([
+                        ...対象ペイン.タブ一覧.map(タブ =>
+                            new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト)),
+                        ...対象ペイン.タブ一覧.flatMap(タブ =>
+                            コンテキスト.タブ内ボタン取得(タブ.id).map(定義 => new タブ内ボタン(定義))),
+                    ]),
                 div({ class: styles.コンテンツエリア }).childs(
                     対象ペイン.タブ一覧.flatMap(タブ => {
                         const コンテンツ = コンテキスト.コンテンツ取得(タブ.id);

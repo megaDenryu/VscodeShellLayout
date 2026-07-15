@@ -9,6 +9,12 @@ import type { DOM同期コンテキスト } from "./DOM同期";
 import { タブID属性 } from "./DOM同期";
 import * as styles from "./style.css";
 
+export interface タブ内ボタン定義 {
+    readonly id: string;
+    readonly ラベル: string;
+    readonly onクリック: () => void;
+}
+
 export class タブボタン extends ButtonC {
     constructor(
         タブ: { readonly id: タブID; readonly ラベル: string; readonly 閉じれる: boolean },
@@ -34,6 +40,15 @@ export class タブボタン extends ButtonC {
             If: タブ.閉じれる,
             True: () => new タブ閉じるボタン(タブ.id, コンテキスト),
         });
+    }
+}
+
+export class タブ内ボタン extends ButtonC {
+    constructor(定義: タブ内ボタン定義) {
+        super({ text: 定義.ラベル, class: styles.タブ内ボタン });
+        this.setAttribute("data-tab-action", 定義.id)
+            .onClick(() => 定義.onクリック());
+        this.addTypedEventListener("pointerdown", (e: PointerEvent) => e.stopPropagation());
     }
 }
 
