@@ -82,4 +82,8 @@ export class アクティビティバー extends LV2HtmlComponentBase {
         });
         this._イベント?.on選択(id);
     }
+
+    バッジ件数を設定する(id: アクティビティID, 件数: number): void {
+        this._項目ボタン一覧.find((ボタン) => ボタン.項目id === id)?.バッジ件数を設定する(件数);
+    }
 }

@@ -65,6 +65,26 @@ export const 項目ラベル = style({
     lineHeight: '1',
 });
 
+export const 項目バッジ = style({
+    position: 'absolute',
+    top: '3px',
+    right: '3px',
+    minWidth: '17px',
+    height: '17px',
+    padding: '0 4px',
+    borderRadius: '999px',
+    backgroundColor: '#d94f5c',
+    color: '#ffffff',
+    fontSize: '10px',
+    fontWeight: 700,
+    lineHeight: '17px',
+    textAlign: 'center',
+    boxSizing: 'border-box',
+    pointerEvents: 'none',
+});
+
+globalStyle(`${項目バッジ}[data-visible="false"]`, { display: 'none' });
+
 // 狭幅対応（オプトイン、外殻レイアウトオプション「狭幅ではラベルを省略する」参照）:
 // data-狭幅ラベル省略="true" を明示指定したアプリだけ、狭幅ビューポートでラベルを
 // 隠す（アイコンのみ表示。ラベルはtitle属性のツールチップとして残す）。属性未指定の
