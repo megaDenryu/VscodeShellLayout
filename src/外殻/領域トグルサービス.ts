@@ -8,6 +8,8 @@ import type { Iレイアウトトグル操作 } from './レイアウトトグル
 // いずれもこのサービスを経由して操作するため、表示状態の食い違いが起きない。
 export class 領域トグルサービス implements Iレイアウトトグル操作 {
     private _サイドバー表示中: boolean;
+    private _サイドバー表示希望: boolean;
+    private _サイドバー利用可能 = true;
     private _パネル表示中: boolean;
 
     constructor(
@@ -17,11 +19,20 @@ export class 領域トグルサービス implements Iレイアウトトグル操
         パネル初期表示: boolean,
     ) {
         this._サイドバー表示中 = サイドバー初期表示;
+        this._サイドバー表示希望 = サイドバー初期表示;
         this._パネル表示中 = パネル初期表示;
     }
 
     サイドバーを切り替える(): void {
+        if (!this._サイドバー利用可能) return;
         this._サイドバー表示中 = !this._サイドバー表示中;
+        this._サイドバー表示希望 = this._サイドバー表示中;
+        this._サイドバー.toggleAttribute(表示状態.attribute, !this._サイドバー表示中, 表示状態.value.collapsed);
+    }
+
+    サイドバー利用可能を設定する(利用可能: boolean): void {
+        this._サイドバー利用可能 = 利用可能;
+        this._サイドバー表示中 = 利用可能 && this._サイドバー表示希望;
         this._サイドバー.toggleAttribute(表示状態.attribute, !this._サイドバー表示中, 表示状態.value.collapsed);
     }
 
