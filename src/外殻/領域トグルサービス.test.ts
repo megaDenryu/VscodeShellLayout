@@ -41,4 +41,15 @@ describe("領域トグルサービス", () => {
         サービス.サイドバーを切り替える();
         expect(サイドバー.dom.element.hasAttribute(表示状態.attribute)).toBe(false);
     });
+
+    it("利用できない文脈では隠し、戻るとユーザーの表示希望を復元する", () => {
+        const サイドバー = div();
+        const サービス = new 領域トグルサービス(サイドバー, new パネルエリア([]), true, true);
+        サービス.サイドバー利用可能を設定する(false);
+        expect(サイドバー.dom.element.getAttribute(表示状態.attribute)).toBe(表示状態.value.collapsed);
+        サービス.サイドバーを切り替える();
+        expect(サイドバー.dom.element.getAttribute(表示状態.attribute)).toBe(表示状態.value.collapsed);
+        サービス.サイドバー利用可能を設定する(true);
+        expect(サイドバー.dom.element.hasAttribute(表示状態.attribute)).toBe(false);
+    });
 });
