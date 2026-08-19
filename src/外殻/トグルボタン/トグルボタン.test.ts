@@ -69,7 +69,7 @@ describe("外殻レイアウト は Iレイアウトトグル操作 として独
         サイドバートグル.配線する(シェル);
 
         // 右サイドバー有効省略時は初期非表示 = data-display="collapsed" が付いている
-        const 対象 = シェル.dom.element.querySelector(`[${表示状態.attribute}]`);
+        const 対象 = シェル.dom.element.querySelector('[class*="右サイドバー"]');
         expect(対象?.getAttribute(表示状態.attribute)).toBe(表示状態.value.collapsed);
 
         クリックする(サイドバートグル.dom.element);

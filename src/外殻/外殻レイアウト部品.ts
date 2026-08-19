@@ -51,6 +51,8 @@ export class 外殻レイアウト部品 {
     private constructor(
         readonly メニューバー: メニューバー | null,
         readonly アクティビティバー: アクティビティバー,
+        readonly 左サイドバー: DivC,
+        readonly 左サイドバースプリッター: スプリッター,
         readonly エディタエリア: エディタエリア,
         readonly パネルエリア: パネルエリア,
         readonly パネルスプリッター: スプリッター,
@@ -81,7 +83,26 @@ export class 外殻レイアウト部品 {
             サイドバー.child(オプション.右サイドバー内容);
         }
 
-        const トグル操作 = new 領域トグルサービス(サイドバー, パネル, サイドバー表示中, パネル表示中);
+        const 左サイドバー = div({ class: styles.左サイドバー })
+            .setAttribute(表示状態.attribute, 表示状態.value.collapsed);
+
+        const 左サイドバースプリッター = new スプリッター('垂直', {
+            onリサイズ中: (delta) => {
+                const 現在幅 = 左サイドバー.dom.element.offsetWidth;
+                const 新幅 = Math.max(150, Math.min(600, 現在幅 + delta));
+                左サイドバー.setStyleCSS({ width: `${新幅}px` });
+            },
+        }).setAttribute(表示状態.attribute, 表示状態.value.collapsed);
+
+        const トグル操作 = new 領域トグルサービス(
+            サイドバー,
+            パネル,
+            サイドバー表示中,
+            パネル表示中,
+            左サイドバー,
+            false,
+            左サイドバースプリッター,
+        );
 
         const ステータス = ステータスバー表示 ? new ステータスバー() : null;
         if (ステータス && オプション.ステータスバー左) {
@@ -122,6 +143,8 @@ export class 外殻レイアウト部品 {
                 オプション.アクティビティバー下部項目一覧,
                 オプション.狭幅ではラベルを省略する,
             ),
+            左サイドバー,
+            左サイドバースプリッター,
             new エディタエリア(オプション.タブバーをウィンドウドラッグ領域にする ?? false),
             パネル,
             パネルスプリッター,

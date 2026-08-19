@@ -78,10 +78,16 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
     protected _componentRoot: DivC;
     private readonly _部品: 外殻レイアウト部品;
     private _メインエリア: DivC | null = null;
+    private readonly _左サイドバービュー一覧 = new Map<アクティビティID, HtmlComponentBase>();
+    private _外部アクティビティ選択リスナー: ((id: アクティビティID) => void) | null = null;
+    private _表示中アクティビティID: アクティビティID | null = null;
 
     constructor(オプション: 外殻レイアウトオプション) {
         super();
         this._部品 = 外殻レイアウト部品.作る(オプション);
+        this._部品.アクティビティバー.イベントを設定する({
+            on選択: (id) => this._アクティビティ選択時処理(id),
+        });
         this._componentRoot = this._ルートを構築する(this._部品);
         if (オプション.テーマ) {
             this._テーマを適用する(オプション.テーマ);
@@ -98,6 +104,8 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
                 { If: メニューバー !== null, True: () => メニューバー ?? undefined },
                 div({ class: styles.中央エリア }).childs([
                     部品.アクティビティバー,
+                    部品.左サイドバー,
+                    部品.左サイドバースプリッター,
                     div({ class: styles.メインエリア })
                         .tap(el => { this._メインエリア = el; })
                         .childs([
@@ -108,6 +116,28 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
                     部品.右サイドバー]),
                 { If: ステータスバー !== null, True: () => ステータスバー ?? undefined }])
         );
+    }
+
+    private _アクティビティ選択時処理(id: アクティビティID): void {
+        const ビュー = this._左サイドバービュー一覧.get(id);
+
+        if (this._表示中アクティビティID === id && this._部品.トグル操作.左サイドバー表示中か()) {
+            // 同じ項目をもう一度クリックしたら左サイドバーをトグルで閉じる
+            this._部品.トグル操作.左サイドバーを閉じる();
+            this._部品.アクティビティバー.選択解除する();
+            this._表示中アクティビティID = null;
+        } else if (ビュー !== undefined) {
+            // 登録済みのアクティビティを選択したときは対応ビューを表示して開く
+            this._部品.左サイドバー.clearChildren().child(ビュー);
+            this._部品.トグル操作.左サイドバーを開く();
+            this._表示中アクティビティID = id;
+        } else {
+            // 未登録のアクティビティを選んだときは左サイドバーを閉じる
+            this._部品.トグル操作.左サイドバーを閉じる();
+            this._表示中アクティビティID = null;
+        }
+
+        this._外部アクティビティ選択リスナー?.(id);
     }
 
     // テーマのCSSカスタムプロパティ化: ルート要素にトークンごとの --vsl-xxx を設定する。
@@ -176,11 +206,20 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
     }
 
     // =========================================================================
-    // アクティビティバーAPI
+    // アクティビティバー・左サイドバーAPI
     // =========================================================================
 
+    左サイドバーへビューを登録する(id: アクティビティID, ビュー: HtmlComponentBase): void {
+        this._左サイドバービュー一覧.set(id, ビュー);
+        if (this._部品.アクティビティバー.選択中IDを取得する() === id) {
+            this._部品.左サイドバー.clearChildren().child(ビュー);
+            this._部品.トグル操作.左サイドバーを開く();
+            this._表示中アクティビティID = id;
+        }
+    }
+
     onアクティビティ選択(コールバック: (id: アクティビティID) => void): void {
-        this._部品.アクティビティバー.イベントを設定する({ on選択: コールバック });
+        this._外部アクティビティ選択リスナー = コールバック;
     }
 
     アクティビティバッジ件数を設定する(id: アクティビティID, 件数: number): void {
@@ -208,7 +247,19 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
         this._部品.トグル操作.サイドバー利用可能を設定する(利用可能);
     }
 
+    左サイドバーを切り替える(): void {
+        this._部品.トグル操作.左サイドバーを切り替える();
+    }
+
     パネルを切り替える(): void {
         this._部品.トグル操作.パネルを切り替える();
+    }
+
+    override delete(): void {
+        for (const ビュー of this._左サイドバービュー一覧.values()) {
+            ビュー.delete();
+        }
+        this._左サイドバービュー一覧.clear();
+        super.delete();
     }
 }

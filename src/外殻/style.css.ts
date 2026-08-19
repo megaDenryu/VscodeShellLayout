@@ -38,6 +38,13 @@ export const メインエリア = style({
     overflow: 'hidden',
 });
 
+export const 左サイドバー = style({
+    width: '260px',
+    backgroundColor: css変数('パネル表面'),
+    borderRight: `1px solid ${css変数('パネル境界線')}`,
+    overflow: 'auto',
+});
+
 export const 右サイドバー = style({
     width: '260px',
     backgroundColor: css変数('パネル表面'),

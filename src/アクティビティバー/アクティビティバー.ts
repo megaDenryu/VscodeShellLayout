@@ -83,6 +83,17 @@ export class アクティビティバー extends LV2HtmlComponentBase {
         this._イベント?.on選択(id);
     }
 
+    選択中IDを取得する(): アクティビティID | null {
+        return this._選択中ID;
+    }
+
+    選択解除する(): void {
+        this._選択中ID = null;
+        this._項目ボタン一覧.forEach((要素) => {
+            要素.アクティブ状態を設定する(false);
+        });
+    }
+
     バッジ件数を設定する(id: アクティビティID, 件数: number): void {
         this._項目ボタン一覧.find((ボタン) => ボタン.項目id === id)?.バッジ件数を設定する(件数);
     }
