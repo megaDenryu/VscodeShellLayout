@@ -7,6 +7,9 @@ export const バー = style({
     width: '48px',
     backgroundColor: css変数('クローム背景'),
     borderRight: `1px solid ${css変数('クローム境界線')}`,
+    // 下端はステータスバーと接する角。既定はクローム背景と同色(不可視)で従来と同じ見た目を保ち、
+    // 配色差のあるテーマだけがクローム下部境界線を上書きして角を収める。
+    borderBottom: `1px solid ${css変数('クローム下部境界線')}`,
     paddingTop: '4px',
     flexShrink: 0,
 });

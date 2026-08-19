@@ -10,6 +10,7 @@ export const テーマCSS変数名: { readonly [K in keyof テーマ配色]: `--
     アプリ背景: '--vsl-app-bg',
     クローム背景: '--vsl-chrome-bg',
     クローム境界線: '--vsl-chrome-border',
+    クローム下部境界線: '--vsl-chrome-border-bottom',
     クロームテキスト: '--vsl-chrome-text',
     テキスト主: '--vsl-text-primary',
     テキスト副: '--vsl-text-secondary',
