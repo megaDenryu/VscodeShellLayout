@@ -1,4 +1,4 @@
-import type { テーマ配色, テーマフォント, テーマ } from './テーマ型';
+import type { テーマ配色, テーマフォント, テーマ } from './テーマ型.ts';
 
 export const フォント: テーマフォント = {
     標準: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
