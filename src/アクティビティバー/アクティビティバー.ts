@@ -38,6 +38,10 @@ export class アクティビティバー extends LV2HtmlComponentBase {
         // 隠す（アイコンのみ表示。ラベルはtitle属性のツールチップへ移す）。
         // 参照: 外殻レイアウトオプション「狭幅ではラベルを省略する」
         private readonly _狭幅ではラベルを省略する?: boolean,
+        // オプトイン（省略時false=旧挙動）。trueのアプリはビューポート幅に関わらずラベルを
+        // 常時隠す（アイコンのみ表示。ラベルはtitle属性のツールチップへ移す）。狭幅時だけ隠す
+        // 上のオプションとは独立に指定できる。参照: 外殻レイアウトオプション「アクティビティバーラベルを常に隠す」
+        private readonly _常にラベルを省略する?: boolean,
     ) {
         super();
         this._componentRoot = this._ルートを構築する(this._項目一覧, this._下部項目一覧);
@@ -52,6 +56,10 @@ export class アクティビティバー extends LV2HtmlComponentBase {
                 .setAttributeIf({
                     If: this._狭幅ではラベルを省略する === true,
                     True: { attr: 'data-狭幅ラベル省略', value: 'true' },
+                })
+                .setAttributeIf({
+                    If: this._常にラベルを省略する === true,
+                    True: { attr: 'data-常時ラベル省略', value: 'true' },
                 })
                 .childs([
                     div({ class: styles.項目群 }).childs(

@@ -32,6 +32,12 @@ export const タブ = style({
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     userSelect: 'none',
+    // タブラベルは1行物のため任意折返しを許さない。幅が足りない場合は末尾を省略する
+    // (title属性を持たせるかはラベルの意味を知る呼び出し側の責任)。
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
     ':hover': { color: css変数('テキスト主') },
 });
 
