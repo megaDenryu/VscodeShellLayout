@@ -71,15 +71,19 @@ describe("外殻レイアウト 左サイドバー", () => {
 
         // 探索ボタン（現在開いている項目）をもう一度クリック
         const 探索ボタン = シェル.dom.element.querySelectorAll('[data-active]')[0];
+        expect(探索ボタン.getAttribute("data-active")).toBe("true");
+
         探索ボタン.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
-        // 閉じる
+        // 閉じる（左サイドバーが非表示になり、アクティビティ選択ハイライトも解除される）
         expect(左サイドバー要素?.getAttribute(表示状態.attribute)).toBe(表示状態.value.collapsed);
+        expect(探索ボタン.getAttribute("data-active")).toBe("false");
 
-        // 再度クリックすると開く
+        // 再度クリックすると開く（左サイドバーが表示され、アクティビティ選択ハイライトも復帰する）
         探索ボタン.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         expect(左サイドバー要素?.hasAttribute(表示状態.attribute)).toBe(false);
         expect(左サイドバー要素?.textContent).toContain("探索コンテンツ");
+        expect(探索ボタン.getAttribute("data-active")).toBe("true");
     });
 
     it("未登録のアクティビティを選んだときは左サイドバーを閉じる", () => {
