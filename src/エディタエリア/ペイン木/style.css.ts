@@ -85,6 +85,9 @@ export const タブ群 = style({
     backgroundColor: css変数("ペイン背景"),
 });
 
+// paddingBottom は選択タブの落影(box-shadow)を描く余白。overflow:auto はコンテナの
+// padding box まで含めてクリップするため、余白が無いと落影がバー自身の縁で切り取られて
+// 見えなくなる(タブ項目の高さ = バーの高さになる従来構成の落とし穴)。
 export const タブバー = style({
     display: "flex",
     flexDirection: "row",
@@ -93,6 +96,7 @@ export const タブバー = style({
     borderBottom: `1px solid ${css変数("ペインタブ境界線")}`,
     flexShrink: 0,
     minHeight: "32px",
+    paddingBottom: "4px",
 });
 
 // =============================================================================
@@ -131,7 +135,7 @@ export const タブボタン = style({
     minWidth: 0,
     flexShrink: 0,
     color: css変数("ペインタブテキスト"),
-    backgroundColor: css変数("ペインタブ境界線"),
+    backgroundColor: css変数("ペインタブ非アクティブ背景"),
     border: "none",
     borderRight: "none",
     cursor: "pointer",
@@ -140,7 +144,7 @@ export const タブボタン = style({
     overflow: "hidden",
     textOverflow: "ellipsis",
     userSelect: "none",
-    transition: "transform 0.2s ease",
+    transition: "transform 0.2s ease, background-color 0.1s ease",
     willChange: "transform",
     // タブバードラッグ領域が有効な祖先の下でも、タブ自体は常にクリック/DnD操作可能にする。
     // ドラッグ領域が無効なときは無害(-webkit-app-regionはドラッグ祖先がない限り無視される)。
@@ -154,18 +158,27 @@ export const タブ状態 = {
     value: { active: "active", inactive: "inactive" },
 } as const;
 
+// 非選択タブへのホバー。非アクティブ面(ペインタブ非アクティブ背景)と選択タブの面
+// (パネル表面)の間の中間段階を示し、クリック前にどのタブが反応しているかを伝える。
+globalStyle(`${タブボタン}[${タブ状態.attribute}="${タブ状態.value.inactive}"]:hover`, {
+    backgroundColor: css変数("ペインタブホバー背景"),
+});
+
 // 選択中タブを「持ち上がったカード」として描き分ける(ユーザー実機指摘: 背景がペイン背景と
 // 同一だったため、ペイン背景自体が明るいテーマで周囲の白と同化し無境界で判別不能だった)。
 // 背景をペイン背景ではなくパネル表面トークンにし、タブバー背景(半透過白になりうる)との
-// 微差で選択状態を示す。上辺にペインアクセントの太線、左右にペインタブ境界線の細線を足し、
-// 4本とも box-shadow(inset) で表現する: border だと幅ぶんの高さ/幅補正が要り、ホスト側の
-// box-sizing 設定(このライブラリはリセットCSSを持たない)に依存してタブが1〜3pxずれる
-// リスクがあるが、inset box-shadow はボックスサイズに一切影響しないため補正不要で済む。
+// 微差で選択状態を示す。上辺にペインアクセントの太線、左右にペインタブ境界線の細線を
+// inset box-shadow で足す(border だと幅ぶんの高さ/幅補正が要り、ホスト側の box-sizing
+// 設定(このライブラリはリセットCSSを持たない)に依存してタブが1〜3pxずれるリスクがあるが、
+// inset box-shadow はボックスサイズに一切影響しないため補正不要で済む)。
+// 加えて非inset(外側)の落影を足し、面の色差だけでは伝わらなかった「浮いている」立体感を
+// 実際の box-shadow で描く(タブバーの paddingBottom が落影のクリップ逃げ場になる)。
 globalStyle(`${タブボタン}[${タブ状態.attribute}="${タブ状態.value.active}"]`, {
     backgroundColor: css変数("パネル表面"),
     color: css変数("ペインタブアクティブテキスト"),
     border: "none",
     boxShadow: [
+        `0 2px 5px 0 ${css変数("ペインタブ影")}`,
         `inset 0 2px 0 0 ${css変数("ペインアクセント")}`,
         `inset 1px 0 0 0 ${css変数("ペインタブ境界線")}`,
         `inset -1px 0 0 0 ${css変数("ペインタブ境界線")}`,
@@ -222,7 +235,7 @@ export const タブ項目 = style({
     minHeight: "32px",
     boxSizing: "border-box",
     flexShrink: 0,
-    backgroundColor: css変数("ペインタブ境界線"),
+    backgroundColor: css変数("ペインタブ非アクティブ背景"),
     borderRight: `1px solid ${css変数("ペイン背景")}`,
     transition: "transform 0.2s ease",
     willChange: "transform",
