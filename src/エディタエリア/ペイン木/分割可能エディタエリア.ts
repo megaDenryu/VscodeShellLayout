@@ -54,7 +54,11 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
 
         this._メイン領域 = div({ class: styles.ルート });
         this._componentRoot = div({ class: styles.ルート }).child(this._メイン領域);
-        this._DOM同期 = new ペイン木DOM同期(this._メイン領域);
+        // _DOM同期コンテキスト() が返す各コールバックは this を捕捉するだけで、
+        // 呼び出し時点で確定済みの値は読まない(_入力配線 等はこの時点で未代入だが、
+        // 実際に呼ばれるのはコンストラクタ完了後のため問題ない)。ここで一度構築して
+        // ペイン木DOM同期 に渡し、以降の同期する() 呼び出しでは持参させない。
+        this._DOM同期 = new ペイン木DOM同期(this._メイン領域, this._DOM同期コンテキスト());
 
         this._入力配線 = new ペイン木入力配線(
             this._メイン領域,
@@ -215,7 +219,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     }
 
     private _再描画(): void {
-        this._DOM同期.同期する(this._レイアウト.メインペイン, this._DOM同期コンテキスト());
+        this._DOM同期.同期する(this._レイアウト.メインペイン);
     }
 
     // タブの追加/削除/分割/移動を伴わない「選択の切り替えだけ」は最頻出の操作。
