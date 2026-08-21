@@ -10,7 +10,7 @@ import {
 } from "./レイアウト型";
 import { 適用, 木の全ペイン, タブを持つペインを探す } from "./レイアウト操作";
 import {
-    ペイン木をDOMに同期,
+    ペイン木DOM同期,
     タブID属性,
     type DOM同期コンテキスト,
 } from "./DOM同期";
@@ -23,6 +23,13 @@ export interface I分割可能エディタイベント {
     onタブ選択: (id: string) => void;
     onタブ閉じる: (id: string) => void;
 }
+
+// タブ内ボタン未設定のタブが毎回このインスタンスを共有して返す。
+// `?? []` のように呼び出しのたびに新しい配列を作ると、DOM同期の「タブ内ボタン一覧の
+// 参照が変わっていないか」という差分判定が常に「変わった」と誤検知し、無関係なタブでも
+// 毎回タブバーを作り直すことになる(コンテンツの detach/reattach 自体は起きないが無駄な
+// DOM 操作が発生する)。空配列を固定インスタンスにして参照比較を機能させる。
+const 空タブ内ボタン一覧: readonly タブ内ボタン定義[] = [];
 
 export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     protected _componentRoot: DivC;
@@ -38,6 +45,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     private readonly _入力配線: ペイン木入力配線;
     private readonly _新タブ群ID採番器 = new ペインID採番器("tabs", 1);
     private readonly _分割ID採番器 = new ペインID採番器("split", 0);
+    private readonly _DOM同期: ペイン木DOM同期;
 
     constructor(private readonly _タブバーをウィンドウドラッグ領域にする = false) {
         super();
@@ -46,6 +54,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
 
         this._メイン領域 = div({ class: styles.ルート });
         this._componentRoot = div({ class: styles.ルート }).child(this._メイン領域);
+        this._DOM同期 = new ペイン木DOM同期(this._メイン領域);
 
         this._入力配線 = new ペイン木入力配線(
             this._メイン領域,
@@ -206,20 +215,21 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     }
 
     private _再描画(): void {
-        ペイン木をDOMに同期(this._メイン領域, this._レイアウト.メインペイン, this._DOM同期コンテキスト());
+        this._DOM同期.同期する(this._レイアウト.メインペイン, this._DOM同期コンテキスト());
     }
 
-    // タブの追加/削除/分割/移動を伴わない「選択の切り替えだけ」は最頻出の操作だが、
-    // _再描画() の全再構築(親.clearChildren() → ペインを構築 で作り直したツリーを再接続)を
-    // 経由すると、既存のコンテンツDOMノード(iframe等)が一度documentから切断されてから
-    // 再接続される。iframeはdocumentから切断された時点で読み込み中のbrowsing contextが
-    // 破棄される仕様のため、切断→再接続のたびに読み込みが最初からやり直しになり、
-    // AgentRoomタブ(iframeでホストする内容)のようなタブがタブ切替のたびに状態を失っていた
+    // タブの追加/削除/分割/移動を伴わない「選択の切り替えだけ」は最頻出の操作。
+    // 元々は _再描画() が親.clearChildren() → ペインを構築 による全再構築だったため、
+    // 選択切替のたびに既存のコンテンツDOMノード(iframe等)が一度documentから切断されてから
+    // 再接続され、iframeの読み込み中browsing contextが破棄されて再読み込みになっていた
     // (Fudaba札#51「タブAからタブBに移動して、またタブAに戻ってくると状態がリセットされる」)。
-    // 選択だけの変更はDOM構造(どの要素がどの親に属するか)を変える必要がないため、
+    // 現在は _再描画() 自体が ペイン木DOM同期 による差分更新(旧木と新木を比較し、参照/id が
+    // 一致する部分の DOM 要素は一切 detach せず再利用する)になり、無関係なタブは
+    // タブの追加/削除/分割/移動でも保持されるようになった(Fudaba札#92)。
+    // それでも選択切替専用にこの経路を残しているのは、選択変更はDOM構造(どの要素がどの親に
+    // 属するか)を一切変える必要がなく、木全体の差分比較すら不要な最も軽い経路だから。
     // 既存ノードの親子関係には触れず、表示中/非表示の切り替えとタブボタンの見た目だけを
-    // 直接書き換える。タブの追加・削除・分割・移動は新規コンテンツの初回接続やペイン形状の
-    // 組み替えを伴い、全再構築のほうが単純で安全なため、引き続き _再描画() を使う。
+    // 直接書き換える。
     private _選択状態のみ反映(): void {
         for (const ペイン of 木の全ペイン(this._レイアウト.メインペイン)) {
             if (ペイン.kind !== "タブ群") continue;
@@ -241,7 +251,7 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
     private _DOM同期コンテキスト(): DOM同期コンテキスト {
         return {
             コンテンツ取得: タブ => this._コンテンツ管理.get(タブ) ?? null,
-            タブ内ボタン取得: タブ => this._タブ内ボタン管理.get(タブ) ?? [],
+            タブ内ボタン取得: タブ => this._タブ内ボタン管理.get(タブ) ?? 空タブ内ボタン一覧,
             タブクリック: タブ => this.タブを選択する(タブ),
             タブ閉じるクリック: タブ => this.タブを閉じる(タブ),
             DnD押下: (タブ, 座標) => this._入力配線.DnD押下処理(タブ, 座標),

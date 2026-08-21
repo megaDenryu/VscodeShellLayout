@@ -1,18 +1,19 @@
-// レイアウト型 → 実 DOM の構築/再描画 (全再描画方式)。
+// レイアウト型 → 実 DOM の同期(差分更新方式)。
+// 旧ペイン木と新ペイン木を位置対応で比較し、参照または id が一致する部分木は
+// 既存の DOM 要素をそのまま流用する。タブ追加/削除/分割/移動のたびに親.clearChildren()
+// で全再構築すると、無関係な既存タブのコンテンツ(iframe 等)まで document から
+// 切断→再接続され、iframe の読み込み中 browsing context が破棄されて再読み込みに
+// なっていた問題(Fudaba札#92)を、変化のあった部分だけを差分更新することで避ける。
 // タブのコンテンツ実体は LV2 オーケストレータ管理の Map から再利用するため、
-// 全再描画でもユーザーから見たコンテンツは破棄されない。
+// 差分更新でもユーザーから見たコンテンツは破棄されない。
 // SengenUI の宣言的 API のみを使い、素 DOM API・addEventListener 直叩きは禁止。
-//
-// 本ファイルの ペインを構築/タブ群ペインを構築 は「不変データ木 → DOMツリー」の再帰変換で、
-// LV2コンポーネントのように更新用メソッドを持つ永続インスタンスではなく、再描画のたびに
-// 使い捨てで作り直す設計そのものがコンテンツ実体の着脱事故を防ぐ核。そのため個々のペイン種別を
-// LV1拡張/LV2素部品へ昇格させず関数のまま維持する（末端の繰り返し要素はタブボタン.ts へ抽出済み）。
 
-import { div, type DivC, type HtmlComponentBase } from "sengen-ui";
+import { type DivC, type HtmlComponentBase } from "sengen-ui";
 import type { ペイン, タブID, ペインID } from "./レイアウト型";
-import { タブボタン, タブ内ボタン, type タブ内ボタン定義 } from "./タブボタン";
-import { 左右分割ペインを構築, 上下分割ペインを構築 } from "./分割ペイン構築";
-import * as styles from "./style.css";
+import type { タブ内ボタン定義 } from "./タブボタン";
+import { タブ群を同期 } from "./タブ群ペイン同期";
+import { 上下分割を同期, 左右分割を同期 } from "./分割ペイン同期";
+import type { 構築済みペイン } from "./構築済みペイン";
 import type { 座標 } from "./DnD制御";
 
 // data 属性は配線層の querySelector で実 DOM を逆引きするため。動的に生成される DOM 構造で
@@ -42,67 +43,43 @@ export interface DOM同期コンテキスト {
     readonly タブバードラッグ領域: boolean;
 }
 
-export function ペイン木をDOMに同期(
-    親: DivC,
-    ペイン: ペイン,
+export function ペインを同期(
+    新: ペイン,
+    旧: 構築済みペイン | null,
     コンテキスト: DOM同期コンテキスト,
-): void {
-    親.clearChildren();
-    親.child(ペインを構築(ペイン, コンテキスト));
-}
-
-export function ペインを構築(対象ペイン: ペイン, コンテキスト: DOM同期コンテキスト): DivC {
-    switch (対象ペイン.kind) {
-        case "タブ群":
-            return タブ群ペインを構築(対象ペイン, コンテキスト);
-        case "左右分割":
-            return 左右分割ペインを構築(対象ペイン, コンテキスト, ペインを構築);
-        case "上下分割":
-            return 上下分割ペインを構築(対象ペイン, コンテキスト, ペインを構築);
+): 構築済みペイン {
+    switch (新.kind) {
+        case "タブ群": {
+            const 対応旧 = 旧 !== null && 旧.kind === "タブ群" && 旧.ペイン.id === 新.id ? 旧 : null;
+            return タブ群を同期(新, 対応旧, コンテキスト);
+        }
+        case "左右分割": {
+            const 対応旧 = 旧 !== null && 旧.kind === "左右分割" && 旧.ペイン.id === 新.id ? 旧 : null;
+            return 左右分割を同期(新, 対応旧, コンテキスト, ペインを同期);
+        }
+        case "上下分割": {
+            const 対応旧 = 旧 !== null && 旧.kind === "上下分割" && 旧.ペイン.id === 新.id ? 旧 : null;
+            return 上下分割を同期(新, 対応旧, コンテキスト, ペインを同期);
+        }
     }
 }
 
-function タブ群ペインを構築(
-    対象ペイン: Extract<ペイン, { kind: "タブ群" }>,
-    コンテキスト: DOM同期コンテキスト,
-): DivC {
-    return (
-        div({ class: styles.タブ群 })
-            .setAttribute(ペインID属性, 対象ペイン.id)
-            .childs([
-                div({ class: styles.タブバー })
-                    .setAttribute(タブバー属性, 対象ペイン.id)
-                    .setAttributeIf({
-                        If: コンテキスト.タブバードラッグ領域,
-                        True: {
-                            attr: styles.タブバードラッグ状態.attribute,
-                            value: styles.タブバードラッグ状態.value.有効,
-                        },
-                    })
-                    .childs(対象ペイン.タブ一覧.map(タブ =>
-                        div({ class: styles.タブ項目 })
-                            .setAttribute(タブ項目属性, タブ.id)
-                            .childs([
-                                new タブボタン(タブ, 対象ペイン.選択中 === タブ.id, コンテキスト),
-                                ...コンテキスト.タブ内ボタン取得(タブ.id).map(定義 => new タブ内ボタン(定義)),
-                            ]))),
-                div({ class: styles.コンテンツエリア }).childs(
-                    対象ペイン.タブ一覧.flatMap(タブ => {
-                        const コンテンツ = コンテキスト.コンテンツ取得(タブ.id);
-                        if (コンテンツ === null) return [];
-                        const isActive = 対象ペイン.選択中 === タブ.id;
-                        // flex:1 + minWidth/minHeight:0 で コンテンツエリア(flex column) の残り空間を
-                        // 全部取り、内部コンテンツがはみ出しても親を超えない。width/height:100% だけだと
-                        // flex 親の制約を尊重しないため「下半分が空」のような表示崩れが起きる。
-                        コンテンツ.setStyleCSS({
-                            display: isActive ? "flex" : "none",
-                            flex: "1",
-                            minWidth: "0",
-                            minHeight: "0",
-                            width: "100%",
-                            height: "100%",
-                        });
-                        return [コンテンツ];
-                    }))])
-    );
+// ペイン木の同期セッション。直近に構築した DOM 状態を保持し、同期のたびに差分だけを
+// 適用する。ルート要素の付け替えが必要なとき(初回、またはルート自体の種別が変わった
+// とき)だけ 親 に触れ、それ以外は 親 の子構成を一切変更しない。
+export class ペイン木DOM同期 {
+    private _現在: 構築済みペイン | null = null;
+
+    constructor(private readonly _親: DivC) {}
+
+    同期する(新ペイン: ペイン, コンテキスト: DOM同期コンテキスト): void {
+        const 新構築済み = ペインを同期(新ペイン, this._現在, コンテキスト);
+        if (this._現在 === null) {
+            this._親.child(新構築済み.要素);
+        } else if (新構築済み.要素 !== this._現在.要素) {
+            this._親.removeChild(this._現在.要素);
+            this._親.child(新構築済み.要素);
+        }
+        this._現在 = 新構築済み;
+    }
 }
