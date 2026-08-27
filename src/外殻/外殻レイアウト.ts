@@ -79,6 +79,7 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
     private readonly _部品: 外殻レイアウト部品;
     private _メインエリア: DivC | null = null;
     private readonly _左サイドバービュー一覧 = new Map<アクティビティID, HtmlComponentBase>();
+    private readonly _左サイドバーを持たない項目一覧 = new Set<アクティビティID>();
     private _外部アクティビティ選択リスナー: ((id: アクティビティID) => void) | null = null;
     private _表示中アクティビティID: アクティビティID | null = null;
 
@@ -119,6 +120,13 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
     }
 
     private _アクティビティ選択時処理(id: アクティビティID): void {
+        // 左サイドバーを持たない項目は、押されたことを外へ伝えるだけで左サイドバーへ触れない。
+        // VSCode本家のアカウント・管理ボタンと同じく、押すと動作を起こすだけの項目を表す。
+        if (this._左サイドバーを持たない項目一覧.has(id)) {
+            this._外部アクティビティ選択リスナー?.(id);
+            return;
+        }
+
         const ビュー = this._左サイドバービュー一覧.get(id);
 
         if (this._表示中アクティビティID === id && this._部品.トグル操作.左サイドバー表示中か()) {
@@ -216,6 +224,14 @@ export class 外殻レイアウト extends LV2部品集約Base<外殻レイア�
             this._部品.トグル操作.左サイドバーを開く();
             this._表示中アクティビティID = id;
         }
+    }
+
+    // 押しても左サイドバーを開かない項目として登録する。押されたことは onアクティビティ選択 の
+    // コールバックへ届き、左サイドバーの表示内容と開閉はそのまま保たれる。
+    // ビュー未登録の項目が左サイドバーを閉じるのは「開くべきビューが無い」ためであり、
+    // 動作を起こすだけの項目とは意味が違うので、こちらは明示の登録で区別する。
+    左サイドバーを持たない項目として登録する(id: アクティビティID): void {
+        this._左サイドバーを持たない項目一覧.add(id);
     }
 
     onアクティビティ選択(コールバック: (id: アクティビティID) => void): void {

@@ -103,6 +103,24 @@ describe("外殻レイアウト 左サイドバー", () => {
         expect(左サイドバー要素?.getAttribute(表示状態.attribute)).toBe(表示状態.value.collapsed);
     });
 
+    it("左サイドバーを持たない項目として登録した項目は、押しても左サイドバーの内容と開閉を変えない", () => {
+        const シェル = new 外殻レイアウト(基本オプション());
+        const 探索ビュー = div({ text: "探索コンテンツ" });
+        シェル.左サイドバーへビューを登録する(アクティビティID("探索"), 探索ビュー);
+        シェル.左サイドバーを持たない項目として登録する(アクティビティID("設定"));
+
+        const コールバック = vi.fn();
+        シェル.onアクティビティ選択(コールバック);
+
+        const 設定ボタン = シェル.dom.element.querySelectorAll('[data-active]')[2];
+        設定ボタン.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        const 左サイドバー要素 = シェル.dom.element.querySelector('[class*="左サイドバー"]');
+        expect(左サイドバー要素?.hasAttribute(表示状態.attribute)).toBe(false);
+        expect(左サイドバー要素?.textContent).toContain("探索コンテンツ");
+        expect(コールバック).toHaveBeenCalledWith(アクティビティID("設定"));
+    });
+
     it("onアクティビティ選択 コールバックが左サイドバー連動と共存して正常に発火する", () => {
         const シェル = new 外殻レイアウト(基本オプション());
         const 探索ビュー = div({ text: "探索コンテンツ" });
