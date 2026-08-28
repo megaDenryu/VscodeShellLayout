@@ -1,6 +1,7 @@
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { フォント } from '../テーマ/デフォルトテーマ';
 import { css変数 } from '../テーマ/テーマCSS変数';
+import { 押せる状態 } from '../外殻/開閉ボタン';
 
 export const バー = style({
     display: 'flex',
@@ -42,4 +43,12 @@ export const トグルボタン = style({
         backgroundColor: css変数('ホバー背景'),
         color: css変数('テキスト主'),
     },
+});
+
+// 領域が利用できない文脈では、開閉ボタンを押せない見た目にする。
+// 押せるのに何も起きないボタンを画面へ残さないためである(エディター制作スキル第5条)。
+globalStyle(`${トグルボタン}[${押せる状態.attribute}="${押せる状態.value.押せない}"]`, {
+    opacity: 0.35,
+    cursor: 'default',
+    pointerEvents: 'none',
 });
