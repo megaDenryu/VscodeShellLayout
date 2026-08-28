@@ -173,6 +173,15 @@ export class 分割可能エディタエリア extends LV2HtmlComponentBase {
         return this._コンテンツ管理.has(タブIDを作る(id));
     }
 
+    // タブの見出しだけを差し替える。コンテンツは触らないため、開いている中身の状態は保たれる。
+    タブのラベルを変える(id: string, 新ラベル: string): void {
+        const 結果 = 適用(this._レイアウト, { kind: "タブラベル変更", タブ: タブIDを作る(id), 新ラベル });
+        if (結果.kind !== "成功") return;
+        if (結果.新レイアウト === this._レイアウト) return;
+        this._レイアウト = 結果.新レイアウト;
+        this._再描画();
+    }
+
     タブ内ボタンを追加する(
         タブid: string,
         ボタンid: string,

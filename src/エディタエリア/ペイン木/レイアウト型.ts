@@ -64,6 +64,7 @@ export type レイアウト操作 =
     | { readonly kind: "タブ追加"; readonly タブ: タブ定義; readonly 配置先ペイン: ペインID }
     | { readonly kind: "タブ閉じる"; readonly タブ: タブID }
     | { readonly kind: "タブ選択"; readonly タブ: タブID }
+    | { readonly kind: "タブラベル変更"; readonly タブ: タブID; readonly 新ラベル: string }
     | {
         readonly kind: "タブ移動";
         readonly タブ: タブID;
