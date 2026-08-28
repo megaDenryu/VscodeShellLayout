@@ -1,4 +1,5 @@
 import { div, DivC } from "sengen-ui";
+import type { HtmlComponentBase } from "sengen-ui";
 import * as styles from './style.css';
 import { タブストリップ, type タブ項目 } from './タブストリップ';
 
@@ -9,10 +10,12 @@ export class パネルエリア部品 {
         readonly コンテンツ: DivC,
     ) {}
 
-    static 作る(タブ一覧: タブ項目[]): パネルエリア部品 {
-        return new パネルエリア部品(
-            new タブストリップ(タブ一覧),
-            div({ class: styles.コンテンツ }),
-        );
+    // コンテンツのスロットは display:block（既定）で、高さの決まった箱として振る舞う
+    // （パネルエリアの高さから タブバーの高さを引いた残り）。注入される内容は自分で
+    // width/height を決めること。参照: SengenUIガイド第15条「コンテンツスロットのレイアウト契約」。
+    static 作る(タブ一覧: タブ項目[], 内容?: HtmlComponentBase): パネルエリア部品 {
+        const コンテンツ = div({ class: styles.コンテンツ });
+        if (内容 !== undefined) コンテンツ.child(内容);
+        return new パネルエリア部品(new タブストリップ(タブ一覧), コンテンツ);
     }
 }

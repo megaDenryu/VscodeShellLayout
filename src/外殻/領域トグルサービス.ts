@@ -1,88 +1,74 @@
 import type { DivC } from "sengen-ui";
-import { 表示状態 } from './表示状態';
+import { 開閉できる領域 } from './開閉できる領域';
 import type { パネルエリア } from '../パネルエリア/パネルエリア';
 import type { スプリッター } from '../スプリッター/スプリッター';
 import type { Iレイアウトトグル操作 } from './レイアウトトグル操作';
 
-// サイドバー/パネル/左サイドバーの表示中フラグと、それに連動するdata-attribute切り替えを1箇所に集約する。
+// 右サイドバー・パネル・左サイドバーの開閉を1箇所に集約する。
 // メニューバー内蔵ボタン・独立トグルボタン（サイドバートグルボタン/パネルトグルボタン）は
 // いずれもこのサービスを経由して操作するため、表示状態の食い違いが起きない。
+// 領域1つぶんの開閉の持ち方は 開閉できる領域 が持ち、ここは3つの領域を名前で束ねるだけである。
 export class 領域トグルサービス implements Iレイアウトトグル操作 {
-    private _サイドバー表示中: boolean;
-    private _サイドバー表示希望: boolean;
-    private _サイドバー利用可能 = true;
-    private _パネル表示中: boolean;
-    private _左サイドバー表示中: boolean;
-    private _左サイドバー表示希望: boolean;
-    private _左サイドバー利用可能 = true;
+    private readonly _右サイドバー: 開閉できる領域;
+    private readonly _パネル: 開閉できる領域;
+    private readonly _左サイドバー: 開閉できる領域 | undefined;
 
     constructor(
-        private readonly _サイドバー: DivC,
-        private readonly _パネル: パネルエリア,
+        サイドバー: DivC,
+        パネル: パネルエリア,
         サイドバー初期表示: boolean,
         パネル初期表示: boolean,
-        private readonly _左サイドバー?: DivC,
+        左サイドバー?: DivC,
         左サイドバー初期表示: boolean = false,
-        private readonly _左サイドバースプリッター?: スプリッター,
+        左サイドバースプリッター?: スプリッター,
+        パネルスプリッター?: スプリッター,
     ) {
-        this._サイドバー表示中 = サイドバー初期表示;
-        this._サイドバー表示希望 = サイドバー初期表示;
-        this._パネル表示中 = パネル初期表示;
-        this._左サイドバー表示中 = 左サイドバー初期表示;
-        this._左サイドバー表示希望 = 左サイドバー初期表示;
+        this._右サイドバー = new 開閉できる領域(サイドバー, サイドバー初期表示);
+        this._パネル = new 開閉できる領域(パネル, パネル初期表示, パネルスプリッター);
+        this._左サイドバー = 左サイドバー === undefined
+            ? undefined
+            : new 開閉できる領域(左サイドバー, 左サイドバー初期表示, 左サイドバースプリッター);
     }
 
     サイドバーを切り替える(): void {
-        if (!this._サイドバー利用可能) return;
-        this._サイドバー表示中 = !this._サイドバー表示中;
-        this._サイドバー表示希望 = this._サイドバー表示中;
-        this._サイドバー.toggleAttribute(表示状態.attribute, !this._サイドバー表示中, 表示状態.value.collapsed);
+        this._右サイドバー.切り替える();
     }
 
     サイドバー利用可能を設定する(利用可能: boolean): void {
-        this._サイドバー利用可能 = 利用可能;
-        this._サイドバー表示中 = 利用可能 && this._サイドバー表示希望;
-        this._サイドバー.toggleAttribute(表示状態.attribute, !this._サイドバー表示中, 表示状態.value.collapsed);
+        this._右サイドバー.利用可能を設定する(利用可能);
     }
 
     パネルを切り替える(): void {
-        this._パネル表示中 = !this._パネル表示中;
-        this._パネル.toggleAttribute(表示状態.attribute, !this._パネル表示中, 表示状態.value.collapsed);
+        this._パネル.切り替える();
+    }
+
+    // 下パネルへ出すものを持たない文脈では false を渡す。人の開閉の希望は覚えたまま領域だけを閉じるため、
+    // 出すものを持つ文脈へ戻ったときに人が開いていた状態が返る。
+    パネル利用可能を設定する(利用可能: boolean): void {
+        this._パネル.利用可能を設定する(利用可能);
+    }
+
+    パネル表示中か(): boolean {
+        return this._パネル.表示中か();
     }
 
     左サイドバーを切り替える(): void {
-        if (!this._左サイドバー || !this._左サイドバー利用可能) return;
-        this._左サイドバー表示中 = !this._左サイドバー表示中;
-        this._左サイドバー表示希望 = this._左サイドバー表示中;
-        this._左サイドバー.toggleAttribute(表示状態.attribute, !this._左サイドバー表示中, 表示状態.value.collapsed);
-        this._左サイドバースプリッター?.toggleAttribute(表示状態.attribute, !this._左サイドバー表示中, 表示状態.value.collapsed);
+        this._左サイドバー?.切り替える();
     }
 
     左サイドバーを開く(): void {
-        if (!this._左サイドバー || !this._左サイドバー利用可能) return;
-        this._左サイドバー表示中 = true;
-        this._左サイドバー表示希望 = true;
-        this._左サイドバー.toggleAttribute(表示状態.attribute, false, 表示状態.value.collapsed);
-        this._左サイドバースプリッター?.toggleAttribute(表示状態.attribute, false, 表示状態.value.collapsed);
+        this._左サイドバー?.開く();
     }
 
     左サイドバーを閉じる(): void {
-        if (!this._左サイドバー) return;
-        this._左サイドバー表示中 = false;
-        this._左サイドバー表示希望 = false;
-        this._左サイドバー.toggleAttribute(表示状態.attribute, true, 表示状態.value.collapsed);
-        this._左サイドバースプリッター?.toggleAttribute(表示状態.attribute, true, 表示状態.value.collapsed);
+        this._左サイドバー?.閉じる();
     }
 
     左サイドバー表示中か(): boolean {
-        return this._左サイドバー表示中;
+        return this._左サイドバー?.表示中か() ?? false;
     }
 
     左サイドバー利用可能を設定する(利用可能: boolean): void {
-        if (!this._左サイドバー) return;
-        this._左サイドバー利用可能 = 利用可能;
-        this._左サイドバー表示中 = 利用可能 && this._左サイドバー表示希望;
-        this._左サイドバー.toggleAttribute(表示状態.attribute, !this._左サイドバー表示中, 表示状態.value.collapsed);
-        this._左サイドバースプリッター?.toggleAttribute(表示状態.attribute, !this._左サイドバー表示中, 表示状態.value.collapsed);
+        this._左サイドバー?.利用可能を設定する(利用可能);
     }
 }

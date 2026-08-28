@@ -1,4 +1,5 @@
 import { div, DivC, LV2部品集約Base } from "sengen-ui";
+import type { HtmlComponentBase } from "sengen-ui";
 import * as styles from './style.css';
 import { パネルエリア部品 } from './パネルエリア部品';
 import type { タブ項目 } from './タブストリップ';
@@ -10,25 +11,32 @@ import type { タブ項目 } from './タブストリップ';
 export class パネルエリア extends LV2部品集約Base<パネルエリア部品> {
     protected _componentRoot: DivC;
     private readonly _部品: パネルエリア部品;
+    private readonly _タブを持つか: boolean;
     private _選択中ID: string | null = null;
 
-    constructor(タブ一覧: タブ項目[]) {
+    constructor(タブ一覧: タブ項目[], 内容?: HtmlComponentBase) {
         super();
-        this._部品 = パネルエリア部品.作る(タブ一覧);
+        this._タブを持つか = タブ一覧.length > 0;
+        this._部品 = パネルエリア部品.作る(タブ一覧, 内容);
         this._componentRoot = this._ルートを構築する(this._部品);
         if (タブ一覧.length > 0) {
             this.タブを選択する(タブ一覧[0].id);
         }
     }
 
+    // タブが1つも無いときはタブバーを木へ含めない。空のタブバーは押せるものが1つも無い帯として
+    // 中身の上に残り、パネルへ注入した内容の高さをそのぶん削るだけになる。
     protected _ルートを構築する(部品: パネルエリア部品): DivC {
         return (
             div({ class: styles.エリア })
                 .setStyleCSS({ height: '200px' })
-                .childs([
-                    部品.タブストリップ.配線する({
-                        on選択: (id) => this.タブを選択する(id),
-                    }),
+                .childIfs([
+                    {
+                        If: this._タブを持つか,
+                        True: () => 部品.タブストリップ.配線する({
+                            on選択: (id) => this.タブを選択する(id),
+                        }),
+                    },
                     部品.コンテンツ])
         );
     }
